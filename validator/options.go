@@ -80,8 +80,8 @@ type ValidationOptions struct {
 	// Available levels: DEBUG, INFO, WARN, ERROR. Default is INFO.
 	LogLevel logging.LogLevel
 
-	// LogFormat specifies the log output format.
-	// Supported values: "text" (human-readable), "json" (structured). Default is "text".
+	// LogFormat specifies the log output format. Logs are written to stderr.
+	// Supported values: "plain" (message only), "text" (key=value), "json" (structured). Default is "plain".
 	LogFormat string
 
 	// Logger allows custom logger injection. If nil, a default logger is created
@@ -95,6 +95,8 @@ type ValidationOptions struct {
 	MaxFindings int
 
 	// AllowSchemaNetwork enables downloading schemas from network for XSD validation.
+	// Default is false: downloaded schemas are not used yet (XSD validation is a
+	// placeholder), and unreachable schema hosts can block validation for minutes.
 	AllowSchemaNetwork bool
 
 	// SchemaCacheDir specifies where downloaded schemas are cached.
@@ -151,11 +153,11 @@ func DefaultValidationOptions() *ValidationOptions {
 		SeverityOverrides:     make(map[string]types.Severity),
 		OutputFormat:          "json",
 		LogLevel:              logging.LevelInfo,
-		LogFormat:             "text",
+		LogFormat:             "plain",
 		Logger:                nil, // Will be created automatically
 		Profile:               "",
 		MaxFindings:           0,
-		AllowSchemaNetwork:    true,
+		AllowSchemaNetwork:    false,
 		SchemaCacheDir:        "",
 		SchemaTimeoutSeconds:  30,
 		UseLibxml2XSD:         false,
@@ -302,7 +304,8 @@ func (o *ValidationOptions) WithLogLevel(level logging.LogLevel) *ValidationOpti
 // WithLogFormat sets the log output format and returns the options for chaining.
 //
 // Supported formats:
-//   - "text": Human-readable text format (default)
+//   - "plain": Message only, one per line (default)
+//   - "text": key=value format with timestamps, levels and context
 //   - "json": Structured JSON format for machine processing
 //
 // Example:

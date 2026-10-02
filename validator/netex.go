@@ -532,7 +532,7 @@ func (v *NetexValidator) validateContentWithCaching(content []byte, filename str
 		ttl := time.Duration(v.options.CacheTTLHours) * time.Hour
 		if err := v.validationCache.Set(fileHash, result, ttl); err != nil {
 			// Log warning but don't fail validation
-			fmt.Printf("Warning: failed to cache validation result: %v\n", err)
+			logging.GetDefaultLogger().Warn("Failed to cache validation result", "error", err)
 		}
 	}
 
@@ -822,13 +822,13 @@ func (r *SimpleXPathRule) safeXPathFind(doc *xmlquery.Node, xpath string) []*xml
 	defer func() {
 		if rec := recover(); rec != nil {
 			// Log the error but don't crash
-			fmt.Printf("Warning: Skipping rule %s due to unsupported XPath function: %v\n", r.rule.Code, rec)
+			logging.GetDefaultLogger().Warn("Skipping rule: unsupported XPath function", "rule", r.rule.Code, "error", rec)
 		}
 	}()
 
 	// Check for unsupported functions before executing
 	if r.hasUnsupportedFunctions(xpath) {
-		fmt.Printf("Warning: Skipping rule %s - contains unsupported XPath function\n", r.rule.Code)
+		logging.GetDefaultLogger().Warn("Skipping rule: unsupported XPath function", "rule", r.rule.Code)
 		return nil
 	}
 

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/antchfx/xmlquery"
+	"github.com/theoremus-urban-solutions/netex-validator/logging"
 	"github.com/theoremus-urban-solutions/netex-validator/utils"
 )
 
@@ -261,7 +262,7 @@ func (sm *SchemaManager) downloadSchema(version string) (*CachedSchema, error) {
 
 		if err := os.WriteFile(filePath, content, 0o600); err != nil {
 			// Log warning but continue
-			fmt.Printf("Warning: failed to cache schema to %s: %v\n", filePath, err)
+			logging.GetDefaultLogger().Warn("Failed to cache schema", "path", filePath, "error", err)
 		}
 
 		return &CachedSchema{
@@ -347,7 +348,7 @@ func (sm *SchemaManager) clearDiskCache() error {
 			filePath := filepath.Join(sm.cacheDir, entry.Name())
 			if err := os.Remove(filePath); err != nil {
 				// Log warning but continue
-				fmt.Printf("Warning: failed to remove cached schema %s: %v\n", filePath, err)
+				logging.GetDefaultLogger().Warn("Failed to remove cached schema", "path", filePath, "error", err)
 			}
 		}
 	}

@@ -65,7 +65,7 @@ type XSDValidationOptions struct {
 // DefaultXSDValidationOptions returns sensible defaults for XSD validation.
 func DefaultXSDValidationOptions() *XSDValidationOptions {
 	return &XSDValidationOptions{
-		AllowNetworkDownload: true,
+		AllowNetworkDownload: false,
 		CacheDirectory:       filepath.Join(os.TempDir(), "netex-schemas"),
 		CacheExpiryHours:     24 * 7, // 1 week
 		StrictMode:           false,

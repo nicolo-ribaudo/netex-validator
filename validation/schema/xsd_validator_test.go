@@ -51,8 +51,8 @@ func TestNewXSDValidator_WithOptions(t *testing.T) {
 func TestDefaultXSDValidationOptions(t *testing.T) {
 	options := DefaultXSDValidationOptions()
 
-	if !options.AllowNetworkDownload {
-		t.Error("Expected AllowNetworkDownload to be true by default")
+	if options.AllowNetworkDownload {
+		t.Error("Expected AllowNetworkDownload to be false by default")
 	}
 
 	if options.CacheExpiryHours != 24*7 {

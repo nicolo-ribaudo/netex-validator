@@ -32,8 +32,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Report entries now include the rule ID (`ruleId`), and grouped JSON notices list the IDs of
   the rules they contain (`ruleIds`).
 
+### Changed
+- Logs are written to stderr instead of stdout, so stdout only carries the report. The default
+  log format is the new `"plain"` (message only); `"text"` and `"json"` are still available via
+  `LogFormat` / `WithLogFormat`.
+- Schema download from the network is now off by default (`--allow-schema-network`,
+  `AllowSchemaNetwork`). Downloaded schemas were not used (XSD validation is not implemented),
+  and unreachable schema hosts could block validation for minutes.
+
 ### Fixed
 - `--skip-validators` was ignored by the CLI.
+- The CLI no longer prints the usage text after a validation run that found errors.
 
 ## [1.0.2] - 2025-09-01
 

@@ -65,9 +65,11 @@ func (l LogLevel) ToSlogLevel() slog.Level {
 type LoggerConfig struct {
 	// Level sets the minimum log level.
 	Level LogLevel
-	// Format specifies the output format ("json" or "text").
+	// Format specifies the output format: "plain" (message only, the default),
+	// "text" (key=value) or "json".
 	Format string
-	// Output specifies the output destination.
+	// Output specifies the output destination (default: stderr, so logs do not
+	// mix with reports written to stdout).
 	Output io.Writer
 	// IncludeSource adds source code information to log entries.
 	IncludeSource bool
@@ -78,11 +80,11 @@ type LoggerConfig struct {
 // NewLogger creates a new structured logger with the specified configuration.
 func NewLogger(config LoggerConfig) *Logger {
 	if config.Output == nil {
-		config.Output = os.Stdout
+		config.Output = os.Stderr
 	}
 
 	if config.Format == "" {
-		config.Format = "text"
+		config.Format = "plain"
 	}
 
 	if config.Component == "" {
@@ -98,6 +100,8 @@ func NewLogger(config LoggerConfig) *Logger {
 	switch config.Format {
 	case "json":
 		handler = slog.NewJSONHandler(config.Output, opts)
+	case "plain":
+		handler = newPlainHandler(config.Output, opts.Level)
 	default:
 		handler = slog.NewTextHandler(config.Output, opts)
 	}
@@ -115,8 +119,8 @@ func NewLogger(config LoggerConfig) *Logger {
 func NewDefaultLogger() *Logger {
 	return NewLogger(LoggerConfig{
 		Level:         LevelInfo,
-		Format:        "text",
-		Output:        os.Stdout,
+		Format:        "plain",
+		Output:        os.Stderr,
 		IncludeSource: false,
 		Component:     "netex-validator",
 	})
@@ -127,7 +131,7 @@ func NewJSONLogger(level LogLevel) *Logger {
 	return NewLogger(LoggerConfig{
 		Level:         level,
 		Format:        "json",
-		Output:        os.Stdout,
+		Output:        os.Stderr,
 		IncludeSource: false,
 		Component:     "netex-validator",
 	})
@@ -138,7 +142,7 @@ func NewDebugLogger() *Logger {
 	return NewLogger(LoggerConfig{
 		Level:         LevelDebug,
 		Format:        "text",
-		Output:        os.Stdout,
+		Output:        os.Stderr,
 		IncludeSource: true,
 		Component:     "netex-validator",
 	})

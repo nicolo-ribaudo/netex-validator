@@ -81,7 +81,7 @@ Examples:
 	// Profile flag retained for compatibility but ignored (EU is default)
 	rootCmd.Flags().StringVar(&profile, "profile", "", "(Deprecated) Ignored; select rules with --rules")
 	rootCmd.Flags().IntVar(&maxFindings, "max-findings", 0, "Maximum number of findings to report (0 = unlimited)")
-	rootCmd.Flags().BoolVar(&allowSchemaNet, "allow-schema-network", true, "Allow downloading NetEX schemas from the network")
+	rootCmd.Flags().BoolVar(&allowSchemaNet, "allow-schema-network", false, "Allow downloading NetEX schemas from the network (currently unused: XSD validation is not implemented)")
 	rootCmd.Flags().StringVar(&schemaCacheDir, "schema-cache-dir", "", "Directory to cache downloaded schemas")
 	rootCmd.Flags().IntVar(&schemaTimeout, "schema-timeout", 30, "Schema download timeout in seconds")
 	rootCmd.Flags().BoolVar(&useLibxml2XSD, "use-libxml2-xsd", false, "Use libxml2-backed XSD validation (experimental)")
@@ -188,11 +188,11 @@ func validateCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	if verbose {
-		fmt.Printf("NetEX Validator - Starting validation\n")
-		fmt.Printf("Input: %s\n", inputFile)
-		fmt.Printf("Codespace: %s\n", codespace)
+		fmt.Fprintf(os.Stderr, "NetEX Validator - Starting validation\n")
+		fmt.Fprintf(os.Stderr, "Input: %s\n", inputFile)
+		fmt.Fprintf(os.Stderr, "Codespace: %s\n", codespace)
 		if configFile != "" {
-			fmt.Printf("Config: %s\n", configFile)
+			fmt.Fprintf(os.Stderr, "Config: %s\n", configFile)
 		}
 	}
 
@@ -247,12 +247,12 @@ func validateCommand(cmd *cobra.Command, args []string) error {
 	isZip := strings.ToLower(filepath.Ext(inputFile)) == ".zip"
 	if isZip {
 		if verbose {
-			fmt.Printf("Processing ZIP dataset...\n")
+			fmt.Fprintf(os.Stderr, "Processing ZIP dataset...\n")
 		}
 		result, err = validator.ValidateZip(inputFile, options)
 	} else {
 		if verbose {
-			fmt.Printf("Processing single XML file...\n")
+			fmt.Fprintf(os.Stderr, "Processing single XML file...\n")
 		}
 		result, err = validator.ValidateFile(inputFile, options)
 	}
@@ -281,15 +281,15 @@ func validateCommand(cmd *cobra.Command, args []string) error {
 
 	if verbose {
 		summary := result.Summary()
-		fmt.Printf("Validation completed: %d issues found (%d files processed)\n",
+		fmt.Fprintf(os.Stderr, "Validation completed: %d issues found (%d files processed)\n",
 			summary.TotalIssues, summary.FilesProcessed)
 
 		if len(summary.IssuesBySeverity) > 0 {
-			fmt.Printf("Issues by severity: ")
+			fmt.Fprintf(os.Stderr, "Issues by severity: ")
 			for severity, count := range summary.IssuesBySeverity {
-				fmt.Printf("%s:%d ", severityToString(severity), count)
+				fmt.Fprintf(os.Stderr, "%s:%d ", severityToString(severity), count)
 			}
-			fmt.Printf("\n")
+			fmt.Fprintf(os.Stderr, "\n")
 		}
 	}
 
@@ -301,13 +301,13 @@ func validateCommand(cmd *cobra.Command, args []string) error {
 	// Exit with error code if validation found errors
 	if !result.IsValid() {
 		if verbose {
-			fmt.Printf("Validation completed with errors\n")
+			fmt.Fprintf(os.Stderr, "Validation completed with errors\n")
 		}
 		return fmt.Errorf("validation found errors")
 	}
 
 	if verbose {
-		fmt.Printf("Validation completed successfully\n")
+		fmt.Fprintf(os.Stderr, "Validation completed successfully\n")
 	}
 
 	return nil
