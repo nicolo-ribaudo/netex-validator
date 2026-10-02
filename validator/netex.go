@@ -1,7 +1,7 @@
 // Package netexvalidator provides a comprehensive NetEX validation library for Go applications.
 //
 // This package validates NetEX (Network Exchange) files against the EU NeTEx Profile,
-// supporting over 200 validation rules covering schema validation, business logic rules,
+// covering schema validation, XPath business rules loaded from JSON rule files,
 // and cross-file ID validation.
 //
 // Basic usage:
@@ -9,7 +9,9 @@
 //	import "github.com/theoremus-urban-solutions/netex-validator"
 //
 //	// Simple validation
-//	options := netexvalidator.DefaultValidationOptions().WithCodespace("MyCodespace")
+//	options := netexvalidator.DefaultValidationOptions().
+//		WithCodespace("MyCodespace").
+//		WithRuleSet("", "rulesets/eu.json")
 //	result, err := netexvalidator.ValidateFile("data.xml", options)
 //	if err != nil {
 //		log.Fatal(err)
@@ -32,7 +34,8 @@
 //   - Single XML file validation
 //   - ZIP dataset validation (multiple files)
 //   - In-memory content validation
-//   - Configurable rule sets via YAML
+//   - Business rules from JSON rule files (see ValidationOptions.RuleSets)
+//   - Rule customization via YAML
 //
 // Output formats include JSON, HTML (with interactive interface), and plain text.
 package validator
@@ -138,7 +141,7 @@ type NetexValidator struct {
 // New creates a new NetexValidator instance with default configuration.
 //
 // The default configuration includes:
-//   - All validation rules enabled
+//   - No XPath business rules (use NewWithOptions with RuleSets to add some)
 //   - Schema validation enabled
 //   - Maximum 100 schema errors reported
 //   - Verbose mode disabled
@@ -161,7 +164,7 @@ func New() (*NetexValidator, error) {
 // This allows you to customize validation behavior such as:
 //   - Skipping schema validation for faster processing
 //   - Setting custom codespace for validation context
-//   - Configuring rule overrides via YAML files
+//   - Selecting JSON rule sets and configuring rule overrides via YAML files
 //   - Enabling verbose output for debugging
 //
 // Parameters:
@@ -173,7 +176,7 @@ func New() (*NetexValidator, error) {
 //
 //	options := netexvalidator.DefaultValidationOptions().
 //		WithCodespace("MyCodespace").
-//		WithVerbose(true).
+//		WithRuleSet("", "rulesets/eu.json").
 //		WithSkipSchema(true)
 //	validator, err := netexvalidator.NewWithOptions(options)
 func NewWithOptions(opts *ValidationOptions) (*NetexValidator, error) {
@@ -267,7 +270,7 @@ func NewWithOptions(opts *ValidationOptions) (*NetexValidator, error) {
 //
 // Example:
 //
-//	options := netexvalidator.DefaultValidationOptions().WithCodespace("NO")
+//	options := netexvalidator.DefaultValidationOptions().WithCodespace("NO").WithRuleSet("", "rulesets/eu.json")
 //	result, err := netexvalidator.ValidateFile("timetable.xml", options)
 //	if err != nil {
 //		log.Fatal(err)
@@ -299,7 +302,7 @@ func ValidateFile(filePath string, options *ValidationOptions) (*ValidationResul
 // Example:
 //
 //	xmlContent := []byte(`<?xml version="1.0"?>...`)
-//	options := netexvalidator.DefaultValidationOptions().WithCodespace("SE")
+//	options := netexvalidator.DefaultValidationOptions().WithCodespace("SE").WithRuleSet("", "rulesets/eu.json")
 //	result, err := netexvalidator.ValidateContent(xmlContent, "in-memory.xml", options)
 func ValidateContent(content []byte, filename string, options *ValidationOptions) (*ValidationResult, error) {
 	validator, err := NewWithOptions(options)
@@ -325,7 +328,7 @@ func ValidateContent(content []byte, filename string, options *ValidationOptions
 //
 // Example:
 //
-//	options := netexvalidator.DefaultValidationOptions().WithCodespace("DK")
+//	options := netexvalidator.DefaultValidationOptions().WithCodespace("DK").WithRuleSet("", "rulesets/eu.json")
 //	result, err := netexvalidator.ValidateZip("dataset.zip", options)
 //	if err != nil {
 //		log.Fatal(err)
@@ -564,12 +567,19 @@ func (v *NetexValidator) initializeRunner(opts *ValidationOptions) error {
 		builder = builder.WithSchemaValidator(schemaValidator)
 	}
 
-	// Add XPath validators if not skipped (EU-only)
+	// Add XPath validators if not skipped
 	if !opts.SkipValidators {
+		logger := opts.GetLogger()
+		if len(opts.RuleSets) == 0 && len(v.config.GetCustomRules()) == 0 {
+			logger.Warn("No rule sets configured; XPath business rules will not run")
+		}
+		loaded, err := rules.LoadRuleSets(opts.RuleSets)
+		if err != nil {
+			return fmt.Errorf("failed to load rule sets: %w", err)
+		}
+		warnUnmatchedRuleConfig(logger, v.config, opts, loaded)
 		// Create rule registry and get enabled rules
-		ruleRegistry := rules.NewRuleRegistry(v.config)
-		// Force EU profile regardless of options
-		ruleRegistry = ruleRegistry.WithProfile("eu")
+		ruleRegistry := rules.NewRuleRegistry(v.config, loaded)
 		enabled := ruleRegistry.GetEnabledRules()
 		// Apply in-memory rule overrides from options (in addition to config)
 		if len(opts.RuleOverrides) > 0 {
@@ -641,6 +651,7 @@ func (v *NetexValidator) createValidationResultFromReport(report *types.Validati
 	var resultEntries []ValidationReportEntry
 	for _, entry := range report.ValidationReportEntries {
 		resultEntries = append(resultEntries, ValidationReportEntry{
+			RuleID:   entry.RuleID,
 			Name:     entry.Name,
 			Message:  entry.Message,
 			Severity: entry.Severity,
@@ -845,4 +856,34 @@ func computeNodeXPath(n *xmlquery.Node) string {
 		parts[i], parts[j] = parts[j], parts[i]
 	}
 	return strings.Join(parts, "")
+}
+
+// warnUnmatchedRuleConfig logs YAML configuration entries and rule/severity
+// overrides that refer to no loaded rule. Rule IDs depend on how rule sets are
+// loaded (e.g. "line/2" vs "eu/line/2"), so this catches stale or mistyped IDs
+// that would otherwise be silently ignored.
+func warnUnmatchedRuleConfig(logger *logging.Logger, cfg *config.ValidatorConfig, opts *ValidationOptions, loaded []rules.Rule) {
+	byNamespace := make(map[string][]string)
+	known := make(map[string]bool)
+	for _, r := range loaded {
+		byNamespace[r.Category] = append(byNamespace[r.Category], r.Key)
+		known[r.Code] = true
+	}
+	for _, custom := range cfg.Rules.Custom {
+		known[custom.Code] = true
+	}
+
+	for _, problem := range cfg.UnmatchedRuleConfig(byNamespace) {
+		logger.Warn("Configuration entry has no effect: " + problem)
+	}
+	for id := range opts.RuleOverrides {
+		if !known[id] {
+			logger.Warn(fmt.Sprintf("Rule override has no effect: no loaded rule has ID %q", id))
+		}
+	}
+	for id := range opts.SeverityOverrides {
+		if !known[id] {
+			logger.Warn(fmt.Sprintf("Severity override has no effect: no loaded rule has ID %q", id))
+		}
+	}
 }

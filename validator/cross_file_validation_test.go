@@ -107,7 +107,7 @@ func TestCrossFileValidation_IdReferences(t *testing.T) {
 		}
 
 		zipFile := tm.CreateTestZipFile(t, "valid_cross_refs.zip", files)
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 
@@ -198,7 +198,7 @@ func TestCrossFileValidation_IdReferences(t *testing.T) {
 		}
 
 		zipFile := tm.CreateTestZipFile(t, "invalid_cross_refs.zip", files)
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 
@@ -296,7 +296,7 @@ func TestCrossFileValidation_CommonDataFiles(t *testing.T) {
 		}
 
 		zipFile := tm.CreateTestZipFile(t, "common_data.zip", files)
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 
@@ -378,7 +378,7 @@ func TestCrossFileValidation_DuplicateIds(t *testing.T) {
 		}
 
 		zipFile := tm.CreateTestZipFile(t, "duplicate_ids.zip", files)
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 
@@ -446,7 +446,7 @@ func TestCrossFileValidation_VersionMismatches(t *testing.T) {
 		}
 
 		zipFile := tm.CreateTestZipFile(t, "version_mismatch.zip", files)
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 
@@ -509,7 +509,7 @@ func TestCrossFileValidation_CircularReferences(t *testing.T) {
 		}
 
 		zipFile := tm.CreateTestZipFile(t, "circular_refs.zip", files)
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 
@@ -585,7 +585,7 @@ func BenchmarkCrossFileValidation_LargeDataset(b *testing.B) {
 	}
 
 	zipFile := createBenchmarkZipFile(tempDir, "large_cross_ref.zip", files)
-	options := DefaultValidationOptions().
+	options := testOptions(b).
 		WithCodespace(testutil.TestCodespace).
 		WithSkipSchema(true)
 

@@ -15,7 +15,7 @@ A comprehensive Go implementation of the NetEX validator for validating NetEX da
 - **Comprehensive Logging**: Structured logging with configurable levels
 
 ### 🔍 Extensive Validation Coverage
-- **240+ Validation Rules**: Comprehensive NetEX business rules
+- **237 Validation Rules**: NetEX business rules in JSON rule sets (73 in the EU set)
 - **Schema Validation**: XML Schema (XSD) validation against NetEX specification
 - **Cross-File Validation**: ID reference validation across multiple files
 - **Transport Mode Validation**: Comprehensive transport mode and submode validation
@@ -36,6 +36,7 @@ A comprehensive Go implementation of the NetEX validator for validating NetEX da
 - **Element Statistics**: GTFS-style statistics showing counts of NetEX elements
 
 ### ⚙️ Flexible Configuration
+- **JSON Rule Sets**: Business rules loaded from JSON files at runtime, selectable per run without recompiling
 - **YAML Configuration**: Rule severity overrides and custom settings
 - **Selective Validation**: Skip schema or business rule validation
 - **Performance Tuning**: Configurable concurrency and cache settings
@@ -71,55 +72,63 @@ Download the latest release from the [GitHub Releases page](https://github.com/t
 
 #### Basic Validation
 ```bash
-# Validate a single NetEX XML file
-./netex-validator validate -i input.xml -c "MyCodespace"
+# Validate a single NetEX XML file against the EU rule set
+./netex-validator -i input.xml -c "MyCodespace" --rules rulesets/eu.json
 
 # Validate a NetEX dataset (ZIP file)
-./netex-validator validate -i dataset.zip -c "MyCodespace"
+./netex-validator -i dataset.zip -c "MyCodespace" --rules rulesets/eu.json
 
 # Generate HTML report
-./netex-validator validate -i input.xml -c "MyCodespace" --html-output report.html
+./netex-validator -i input.xml -c "MyCodespace" --rules rulesets/eu.json --format html -o report.html
 ```
+
+Business rules are not built into the binary: they are read from the JSON rule files passed
+with `--rules` (see [Rule Sets](#-rule-sets)). `--rules` is required unless `--skip-validators` is given.
 
 #### Advanced Options
 ```bash
-# Skip schema validation for faster processing
-./netex-validator validate -i input.xml -c "MyCodespace" --skip-schema
+# Run the EU rules plus extra rule files
+./netex-validator -i input.xml -c "MyCodespace" --rules rulesets/eu.json --rules ./local-rules.json
 
-# Enable validation caching with custom TTL
-./netex-validator validate -i input.xml -c "MyCodespace" --cache --cache-ttl 24h
+# Skip schema validation for faster processing
+./netex-validator -i input.xml -c "MyCodespace" --rules rulesets/eu.json --skip-schema
+
+# Schema validation only
+./netex-validator -i input.xml -c "MyCodespace" --skip-validators
+
+# Enable validation caching with custom TTL (hours)
+./netex-validator -i input.xml -c "MyCodespace" --rules rulesets/eu.json --enable-cache --cache-ttl 24
 
 # Limit concurrent processing
-./netex-validator validate -i dataset.zip -c "MyCodespace" --concurrent-files 2
+./netex-validator -i dataset.zip -c "MyCodespace" --rules rulesets/eu.json --concurrent 2
 
 # Verbose output with debug information
-./netex-validator validate -i input.xml -c "MyCodespace" --verbose
+./netex-validator -i input.xml -c "MyCodespace" --rules rulesets/eu.json --verbose
 
 # Custom configuration file
-./netex-validator validate -i input.xml -c "MyCodespace" --config config.yaml
+./netex-validator -i input.xml -c "MyCodespace" --rules rulesets/eu.json --config config.yaml
 ```
 
 #### Configuration File Example
 
+The YAML configuration can turn rule namespaces or single rules on and off and change their
+severity. Namespaces and keys are the ones in the rule IDs (see [Rule IDs](#rule-ids)).
+
 ```yaml
 # config.yaml
 rules:
-  severityOverrides:
-    TRANSPORT_MODE_1: WARNING
-    SERVICE_JOURNEY_3: INFO
-  disabled:
-    - OPTIONAL_RULE_1
-    - DEPRECATED_RULE_2
-
-performance:
-  maxSchemaErrors: 50
-  concurrentFiles: 4
-  
-cache:
-  enabled: true
-  maxEntries: 1000
-  maxMemoryMB: 100
-  ttlHours: 24
+  categories:
+    # Applies to line/* (or eu/line/* when loaded with --rules:eu=rulesets/eu.json)
+    line:
+      defaultSeverity: WARNING
+      rules:
+        "2":
+          severity: ERROR
+        "3":
+          enabled: false
+    # Disables every rule nested under transport_mode
+    transport_mode:
+      enabled: false
 ```
 
 ### Go Library API
@@ -137,8 +146,11 @@ import (
 )
 
 func main() {
-    // Create validator with default options
-    v, err := validator.New()
+    // Create validator with the EU rule set
+    options := validator.DefaultValidationOptions().
+        WithCodespace("MyCodespace").
+        WithRuleSet("", "rulesets/eu.json")
+    v, err := validator.NewWithOptions(options)
     if err != nil {
         log.Fatal(err)
     }
@@ -167,6 +179,7 @@ func main() {
 package main
 
 import (
+    "github.com/theoremus-urban-solutions/netex-validator/types"
     "github.com/theoremus-urban-solutions/netex-validator/validator"
 )
 
@@ -174,6 +187,9 @@ func main() {
     // Create validator with custom options
     options := validator.DefaultValidationOptions().
         WithCodespace("MyOrg").
+        WithRuleSet("eu", "rulesets/eu.json").      // rule IDs like "eu/line/2"
+        WithRuleSet("local", "local-rules.json").   // rule IDs like "local/my-rule"
+        WithSeverityOverride("eu/line/3", types.ERROR).
         WithSkipSchema(false).
         WithValidationCache(true, 1000, 100, 24).
         WithConcurrentFiles(4).
@@ -215,7 +231,7 @@ import (
 )
 
 func main() {
-    v, _ := validator.New()
+    v, _ := validator.NewWithOptions(validator.DefaultValidationOptions().WithRuleSet("", "rulesets/eu.json"))
     
     files := []string{"file1.xml", "file2.xml", "file3.xml"}
     results := make([]*validator.ValidationResult, len(files))
@@ -250,7 +266,8 @@ netex-validator/
 │   ├── schema/                # XSD schema validation
 │   ├── context/               # Validation context management
 │   └── ids/                   # ID and reference validation
-├── rules/                     # Business rule definitions
+├── rules/                     # Rule loading (JSON rule sets) and registry
+├── rulesets/                  # Shipped JSON rule sets (eu.json, extended.json)
 ├── reporting/                 # Error reporting and formatting
 ├── config/                    # Configuration management
 ├── logging/                   # Structured logging
@@ -269,9 +286,76 @@ netex-validator/
 - **CacheManager**: TTL-based validation result caching
 - **ConfigManager**: YAML-based configuration handling
 
+## 📚 Rule Sets
+
+XPath business rules live in JSON files, not in the Go code, so they can be changed without
+recompiling. Each file you pass with `--rules` is a filter set: run more or fewer rules by passing
+more or fewer files.
+
+### Rule file format
+
+```json
+{
+  "extends": {
+    "stop_points": "./stop_points.json"
+  },
+  "rules": {
+    "2": {
+      "name": "Line missing Name",
+      "message": "Line is missing Name",
+      "severity": "ERROR",
+      "xpath": "//lines/Line[not(Name)]"
+    },
+    "uses-current": {
+      "name": "Rule using an unsupported XPath function",
+      "severity": "WARNING",
+      "xpath": "//a[@ref = current()/b]",
+      "skip": true
+    }
+  }
+}
+```
+
+- `rules` is an object keyed by rule key. Each rule needs `name`, `severity`
+  (`INFO`, `WARNING`, `ERROR` or `CRITICAL`) and `xpath`; `message` and `description` are optional.
+  The XPath selects the offending nodes: every match is reported as a finding.
+- `"skip": true` keeps a rule in the file without running it (its XPath is not compiled).
+- `extends` includes other rule files under a nested namespace. Paths are relative to the file
+  that contains the `extends` block.
+- Files are checked strictly when loaded: unknown or duplicate fields, duplicate keys, invalid
+  severities and XPaths that do not compile are errors that name the file and rule.
+
+### Rule IDs
+
+A rule's ID is its namespace path and key joined with `/`. The namespace of a file passed on the
+command line is the name given with `--rules:<name>`, or the file base name otherwise. A single
+`--rules` without a name is not namespaced:
+
+| Command line | ID of rule `2` in `line.json`, extended by `eu.json` as `line` |
+|---|---|
+| `--rules rulesets/eu.json` | `line/2` |
+| `--rules:foo rulesets/eu.json` (or `--rules:foo=rulesets/eu.json`) | `foo/line/2` |
+| `--rules rulesets/eu.json --rules local.json` | `eu/line/2` (and `local/...`) |
+
+The same namespace cannot be used twice; rename one of the files with `--rules:<name>=<path>`.
+Rule IDs are used in reports, in `WithRuleOverride` / `WithSeverityOverride` and in the YAML configuration.
+Because they depend on how the files are passed, YAML entries and overrides written for one invocation
+(e.g. `line/2`) do not apply to another (`eu/line/2`); the validator warns about entries that match no
+loaded rule. Rules defined directly in a single unnamed file have no namespace (ID `2`); address them
+in YAML under the category `""`, or give the file a name with `--rules:<name>=<path>`.
+
+### Shipped rule sets
+
+- `rulesets/eu.json` extends one file per topic in `rulesets/eu/`: the EU NeTEx Profile rules that
+  the validator has always run by default.
+- `rulesets/extended.json` extends `rulesets/extended/`: additional rules (service journeys,
+  booking, flexible services, frames, stop places, ...) that were previously defined but disabled.
+
+Individual topic files can also be passed directly, e.g. `--rules rulesets/eu/line.json`.
+
 ## 📋 Validation Rules
 
-The validator implements 240+ comprehensive validation rules covering:
+The shipped rule sets contain 237 active validation rules (73 in `eu.json`, 164 in `extended.json`, plus 7 marked `skip`) covering:
 
 ### Schema Validation
 - XML well-formedness and namespace validation
@@ -425,20 +509,19 @@ The project maintains high test coverage with:
 
 ### Adding New Validation Rules
 
-1. **Define Rule**: Create rule definition in `rules/`
-```go
-var TransportModeRequired = ValidationRule{
-    Code:     "TRANSPORT_MODE_1",
-    Name:     "Line TransportMode Required",
-    Message:  "Line is missing required TransportMode",
-    Severity: ERROR,
-    XPath:    "//Line[not(TransportMode)]",
+1. **Define Rule**: Add it to the relevant file in `rulesets/` (or a new file, added to the
+   `extends` block of `rulesets/eu.json` or `rulesets/extended.json`)
+```json
+"MISSING_REQUIRED": {
+  "name": "Missing required transport mode",
+  "message": "TransportMode is required for all Lines and FlexibleLines",
+  "severity": "ERROR",
+  "xpath": "//lines/*[self::Line or self::FlexibleLine][not(TransportMode)]"
 }
 ```
 
-2. **Register Rule**: Add to rule registry
-3. **Add Tests**: Create comprehensive test cases
-4. **Update Documentation**: Add to rule documentation
+2. **Add Tests**: `go test ./rules/` checks that every shipped rule file loads
+3. **Update Documentation**: Add to rule documentation
 
 ### Contributing
 

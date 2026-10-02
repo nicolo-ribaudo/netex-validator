@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -422,4 +423,19 @@ func generateLargeTestDataset() string {
 </PublicationDelivery>`)
 
 	return lines.String()
+}
+
+// RuleSetPath returns the absolute path of the shipped rule file rulesets/<name>.json
+// (e.g. "eu" or "eu/line"), failing the test if it does not exist.
+func RuleSetPath(tb testing.TB, name string) string {
+	tb.Helper()
+	_, thisFile, _, ok := runtime.Caller(0)
+	if !ok {
+		tb.Fatal("cannot determine testutil source location")
+	}
+	path := filepath.Join(filepath.Dir(thisFile), "..", "rulesets", filepath.FromSlash(name)+".json")
+	if _, err := os.Stat(path); err != nil {
+		tb.Fatalf("rule set %q not found: %v", name, err)
+	}
+	return path
 }

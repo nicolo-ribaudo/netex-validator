@@ -1,0 +1,46 @@
+{
+  "rules": {
+    "COMPOSITE_FRAME_1": {
+      "name": "CompositeFrame must be exactly one",
+      "message": "There must be exactly one CompositeFrame",
+      "severity": "ERROR",
+      "xpath": "//CompositeFrame[count(//CompositeFrame) != 1]"
+    },
+    "RESOURCE_FRAME_IN_LINE_FILE": {
+      "name": "ResourceFrame must be exactly one in line file",
+      "message": "Line file must contain exactly one ResourceFrame",
+      "severity": "ERROR",
+      "xpath": "//ResourceFrame[count(//ResourceFrame) != 1]"
+    },
+    "SERVICE_FRAME_1": {
+      "name": "ServiceFrame missing in CompositeFrame",
+      "message": "CompositeFrame is missing ServiceFrame",
+      "severity": "ERROR",
+      "xpath": "//CompositeFrame[not(ServiceFrame)]"
+    },
+    "TIMETABLE_FRAME_1": {
+      "name": "TimetableFrame missing in CompositeFrame",
+      "message": "CompositeFrame is missing TimetableFrame",
+      "severity": "WARNING",
+      "xpath": "//CompositeFrame[not(TimetableFrame)]"
+    },
+    "COMPOSITE_FRAME_STRUCTURE": {
+      "name": "Invalid CompositeFrame structure",
+      "message": "CompositeFrame must contain required child frames",
+      "severity": "ERROR",
+      "xpath": "//CompositeFrame[not(frames)]"
+    },
+    "SERVICE_FRAME_STRUCTURE": {
+      "name": "Invalid ServiceFrame structure",
+      "message": "ServiceFrame must contain service-related elements",
+      "severity": "WARNING",
+      "xpath": "//ServiceFrame[not(lines) and not(routes) and not(journeyPatterns) and not(vehicleJourneys) and not(stopAssignments)]"
+    },
+    "RESOURCE_FRAME_STRUCTURE": {
+      "name": "Invalid ResourceFrame structure",
+      "message": "ResourceFrame must contain resource elements",
+      "severity": "WARNING",
+      "xpath": "//ResourceFrame[not(organisations) and not(operationalContexts) and not(vehicleTypes) and not(equipments)]"
+    }
+  }
+}

@@ -361,28 +361,32 @@ func getBusinessRuleSuggestions(ruleCode, message string) []string {
 		"Consider if this is a data quality issue that needs fixing at the source",
 	}
 
-	switch ruleCode {
-	case "LINE_2":
+	// Match on the last namespace segment and the key, so that the outer
+	// namespaces (e.g. "eu/line/2" vs "line/2") do not matter. This assumes the
+	// shipped topic files are loaded under their usual names (via the eu.json
+	// aggregate or as one of several --rules files).
+	switch lastPathSegments(ruleCode, 2) {
+	case "line/2":
 		suggestions = append(suggestions,
 			"Add a descriptive <Name> element to the Line",
 			"Names should be passenger-friendly and match published information",
 		)
-	case "LINE_4":
+	case "line/4":
 		suggestions = append(suggestions,
 			"Add a <TransportMode> element specifying the type of transport",
 			"Common modes: bus, rail, tram, metro",
 		)
-	case "SERVICE_JOURNEY_5":
+	case "service_journey/5":
 		suggestions = append(suggestions,
 			"Add a <DepartureTime> to the first TimetabledPassingTime",
 			"Departure times are mandatory for the first stop of each journey",
 		)
-	case "SERVICE_JOURNEY_6":
+	case "service_journey/6":
 		suggestions = append(suggestions,
 			"Add an <ArrivalTime> to the last TimetabledPassingTime",
 			"Arrival times are mandatory for the last stop of each journey",
 		)
-	case "ROUTE_3":
+	case "route/3":
 		suggestions = append(suggestions,
 			"Add a <LineRef> element referencing the parent Line",
 			"Routes must be associated with a specific Line",
@@ -494,4 +498,13 @@ func (f *ErrorFormatter) FormatAsList(errors []*ValidationError) string {
 	}
 
 	return builder.String()
+}
+
+// lastPathSegments returns the last n "/"-separated segments of a rule ID.
+func lastPathSegments(id string, n int) string {
+	parts := strings.Split(id, "/")
+	if len(parts) > n {
+		parts = parts[len(parts)-n:]
+	}
+	return strings.Join(parts, "/")
 }

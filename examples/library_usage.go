@@ -13,8 +13,9 @@ import (
 
 // ExampleBasicValidation demonstrates the simplest way to validate a NetEX file.
 func ExampleBasicValidation() {
-	// Validate a NetEX file with default options
-	result, err := validator.ValidateFile("example.xml", validator.DefaultValidationOptions())
+	// Validate a NetEX file against the shipped EU rule set
+	options := validator.DefaultValidationOptions().WithRuleSet("", "rulesets/eu.json")
+	result, err := validator.ValidateFile("example.xml", options)
 	if err != nil {
 		log.Fatalf("Validation failed: %v", err)
 	}
@@ -34,6 +35,8 @@ func ExampleValidationWithOptions() {
 	// Create options with method chaining
 	options := validator.DefaultValidationOptions().
 		WithCodespace("NO").
+		WithRuleSet("eu", "rulesets/eu.json").    // rule IDs like "eu/line/2"
+		WithRuleSet("local", "local-rules.json"). // your own rules, as "local/<key>"
 		WithVerbose(true).
 		WithSkipSchema(false)
 
@@ -69,7 +72,7 @@ func ExampleMemoryValidation() {
 	</dataObjects>
 </PublicationDelivery>`)
 
-	options := validator.DefaultValidationOptions().WithCodespace("TEST")
+	options := validator.DefaultValidationOptions().WithCodespace("TEST").WithRuleSet("", "rulesets/eu.json")
 	result, err := validator.ValidateContent(xmlData, "in-memory.xml", options)
 	if err != nil {
 		log.Fatalf("Memory validation failed: %v", err)
@@ -86,7 +89,7 @@ func ExampleBatchValidation() {
 		"data/file3.xml",
 	}
 
-	options := validator.DefaultValidationOptions().WithCodespace("BATCH")
+	options := validator.DefaultValidationOptions().WithCodespace("BATCH").WithRuleSet("", "rulesets/eu.json")
 
 	for i, file := range files {
 		fmt.Printf("Validating file %d: %s\n", i+1, file)
@@ -114,7 +117,7 @@ func ExampleBatchValidation() {
 
 // ExampleOutputFormats demonstrates different output formats.
 func ExampleOutputFormats() {
-	result, err := validator.ValidateFile("example.xml", validator.DefaultValidationOptions())
+	result, err := validator.ValidateFile("example.xml", validator.DefaultValidationOptions().WithRuleSet("", "rulesets/eu.json"))
 	if err != nil {
 		log.Fatalf("Validation failed: %v", err)
 	}
@@ -146,7 +149,7 @@ func ExampleOutputFormats() {
 
 // ExampleErrorHandling demonstrates proper error handling patterns.
 func ExampleErrorHandling() {
-	options := validator.DefaultValidationOptions().WithCodespace("ERROR_TEST")
+	options := validator.DefaultValidationOptions().WithCodespace("ERROR_TEST").WithRuleSet("", "rulesets/eu.json")
 
 	result, err := validator.ValidateFile("nonexistent.xml", options)
 	if err != nil {
@@ -182,6 +185,7 @@ func ExampleAdvancedValidation() {
 	// Validate with performance monitoring
 	options := validator.DefaultValidationOptions().
 		WithCodespace("ADVANCED").
+		WithRuleSet("", "rulesets/eu.json").
 		WithVerbose(true)
 
 	result, err := validator.ValidateFile("large_file.xml", options)
@@ -237,7 +241,7 @@ func ExampleAdvancedValidation() {
 // ExampleDirectoryValidation demonstrates validating all XML files in a directory.
 func ExampleDirectoryValidation() {
 	directory := "netex_data"
-	options := validator.DefaultValidationOptions().WithCodespace("DIR")
+	options := validator.DefaultValidationOptions().WithCodespace("DIR").WithRuleSet("", "rulesets/eu.json")
 
 	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -285,7 +289,7 @@ func ExampleValidationPipeline() {
 
 	files := []string{"input1.xml", "input2.xml", "input3.xml"}
 	results := make([]ProcessingResult, 0, len(files))
-	options := validator.DefaultValidationOptions().WithCodespace("PIPELINE")
+	options := validator.DefaultValidationOptions().WithCodespace("PIPELINE").WithRuleSet("", "rulesets/eu.json")
 
 	// Validation phase
 	for _, file := range files {
@@ -348,7 +352,8 @@ func ExampleCustomValidationWorkflow() {
 
 	// Setup validation options
 	options := validator.DefaultValidationOptions().
-		WithCodespace(config.Codespace)
+		WithCodespace(config.Codespace).
+		WithRuleSet("", "rulesets/eu.json")
 
 	// Ensure output directory exists
 	if err := os.MkdirAll(config.OutputDir, 0750); err != nil {

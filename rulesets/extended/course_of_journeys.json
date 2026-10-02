@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "1": {
+      "name": "CourseOfJourneys missing Name",
+      "message": "CourseOfJourneys is missing Name",
+      "severity": "WARNING",
+      "xpath": "//CourseOfJourneys[not(Name) or normalize-space(Name) = '']"
+    },
+    "2": {
+      "name": "CourseOfJourneys missing journeys",
+      "message": "CourseOfJourneys is missing journeys",
+      "severity": "ERROR",
+      "xpath": "//CourseOfJourneys[not(journeys)]"
+    }
+  }
+}

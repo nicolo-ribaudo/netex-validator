@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "1": {
+      "name": "TariffZone missing Name",
+      "message": "TariffZone is missing Name",
+      "severity": "WARNING",
+      "xpath": "//tariffzones/TariffZone[not(Name) or normalize-space(Name) = '']"
+    },
+    "2": {
+      "name": "TariffZone missing Centroid",
+      "message": "TariffZone is missing Centroid",
+      "severity": "WARNING",
+      "xpath": "//tariffzones/TariffZone[not(Centroid)]"
+    }
+  }
+}

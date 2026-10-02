@@ -8,7 +8,7 @@ import (
 // BenchmarkValidateFile_ValidMinimal benchmarks validation of a valid minimal NetEX file.
 func BenchmarkValidateFile_ValidMinimal(b *testing.B) {
 	testFile := filepath.Join("..", "..", "testdata", "valid_minimal.xml")
-	options := DefaultValidationOptions().WithCodespace("BENCH")
+	options := testOptions(b).WithCodespace("BENCH")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -23,7 +23,7 @@ func BenchmarkValidateFile_ValidMinimal(b *testing.B) {
 // BenchmarkValidateFile_InvalidMissingElements benchmarks validation of a file with missing elements.
 func BenchmarkValidateFile_InvalidMissingElements(b *testing.B) {
 	testFile := filepath.Join("..", "..", "testdata", "invalid_missing_elements.xml")
-	options := DefaultValidationOptions().WithCodespace("BENCH")
+	options := testOptions(b).WithCodespace("BENCH")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -38,7 +38,7 @@ func BenchmarkValidateFile_InvalidMissingElements(b *testing.B) {
 // BenchmarkValidateFile_InvalidTransportModes benchmarks validation of a file with invalid transport modes.
 func BenchmarkValidateFile_InvalidTransportModes(b *testing.B) {
 	testFile := filepath.Join("..", "..", "testdata", "invalid_transport_modes.xml")
-	options := DefaultValidationOptions().WithCodespace("BENCH")
+	options := testOptions(b).WithCodespace("BENCH")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -53,7 +53,7 @@ func BenchmarkValidateFile_InvalidTransportModes(b *testing.B) {
 // BenchmarkValidateFile_WithSchemaSkip benchmarks validation with schema validation disabled.
 func BenchmarkValidateFile_WithSchemaSkip(b *testing.B) {
 	testFile := filepath.Join("..", "..", "testdata", "valid_minimal.xml")
-	options := DefaultValidationOptions().
+	options := testOptions(b).
 		WithCodespace("BENCH").
 		WithSkipSchema(true)
 
@@ -70,7 +70,7 @@ func BenchmarkValidateFile_WithSchemaSkip(b *testing.B) {
 // BenchmarkValidateFile_Verbose benchmarks validation with verbose output enabled.
 func BenchmarkValidateFile_Verbose(b *testing.B) {
 	testFile := filepath.Join("..", "..", "testdata", "valid_minimal.xml")
-	options := DefaultValidationOptions().
+	options := testOptions(b).
 		WithCodespace("BENCH").
 		WithVerbose(true)
 
@@ -87,7 +87,7 @@ func BenchmarkValidateFile_Verbose(b *testing.B) {
 // BenchmarkValidateFile_StopOnFirstError benchmarks validation with stop-on-first-error enabled.
 func BenchmarkValidateFile_StopOnFirstError(b *testing.B) {
 	testFile := filepath.Join("..", "..", "testdata", "invalid_missing_elements.xml")
-	options := DefaultValidationOptions().
+	options := testOptions(b).
 		WithCodespace("BENCH")
 
 	b.ResetTimer()
@@ -133,7 +133,7 @@ func BenchmarkValidateData_ValidMinimal(b *testing.B) {
 	</dataObjects>
 </PublicationDelivery>`)
 
-	options := DefaultValidationOptions().WithCodespace("BENCH")
+	options := testOptions(b).WithCodespace("BENCH")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -169,7 +169,7 @@ func BenchmarkValidateData_InvalidData(b *testing.B) {
 	</dataObjects>
 </PublicationDelivery>`)
 
-	options := DefaultValidationOptions().WithCodespace("BENCH")
+	options := testOptions(b).WithCodespace("BENCH")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -185,7 +185,7 @@ func BenchmarkValidateData_InvalidData(b *testing.B) {
 func BenchmarkValidationOptions_Creation(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		options := DefaultValidationOptions().
+		options := testOptions(b).
 			WithCodespace("BENCH").
 			WithVerbose(true).
 			WithSkipSchema(false)
@@ -197,7 +197,7 @@ func BenchmarkValidationOptions_Creation(b *testing.B) {
 func BenchmarkValidationResult_Summary(b *testing.B) {
 	// Pre-validate a file to get a result
 	testFile := filepath.Join("..", "..", "testdata", "invalid_missing_elements.xml")
-	options := DefaultValidationOptions().WithCodespace("BENCH")
+	options := testOptions(b).WithCodespace("BENCH")
 	result, err := ValidateFile(testFile, options)
 	if err != nil {
 		b.Fatalf("Setup failed: %v", err)
@@ -214,7 +214,7 @@ func BenchmarkValidationResult_Summary(b *testing.B) {
 func BenchmarkValidationResult_ToJSON(b *testing.B) {
 	// Pre-validate a file to get a result
 	testFile := filepath.Join("..", "..", "testdata", "invalid_missing_elements.xml")
-	options := DefaultValidationOptions().WithCodespace("BENCH")
+	options := testOptions(b).WithCodespace("BENCH")
 	result, err := ValidateFile(testFile, options)
 	if err != nil {
 		b.Fatalf("Setup failed: %v", err)
@@ -234,7 +234,7 @@ func BenchmarkValidationResult_ToJSON(b *testing.B) {
 func BenchmarkValidationResult_ToHTML(b *testing.B) {
 	// Pre-validate a file to get a result
 	testFile := filepath.Join("..", "..", "testdata", "invalid_missing_elements.xml")
-	options := DefaultValidationOptions().WithCodespace("BENCH")
+	options := testOptions(b).WithCodespace("BENCH")
 	result, err := ValidateFile(testFile, options)
 	if err != nil {
 		b.Fatalf("Setup failed: %v", err)
@@ -254,7 +254,7 @@ func BenchmarkValidationResult_ToHTML(b *testing.B) {
 func BenchmarkValidationResult_String(b *testing.B) {
 	// Pre-validate a file to get a result
 	testFile := filepath.Join("..", "..", "testdata", "invalid_missing_elements.xml")
-	options := DefaultValidationOptions().WithCodespace("BENCH")
+	options := testOptions(b).WithCodespace("BENCH")
 	result, err := ValidateFile(testFile, options)
 	if err != nil {
 		b.Fatalf("Setup failed: %v", err)
@@ -271,7 +271,7 @@ func BenchmarkValidationResult_String(b *testing.B) {
 func BenchmarkValidationResult_IsValid(b *testing.B) {
 	// Pre-validate a file to get a result
 	testFile := filepath.Join("..", "..", "testdata", "invalid_missing_elements.xml")
-	options := DefaultValidationOptions().WithCodespace("BENCH")
+	options := testOptions(b).WithCodespace("BENCH")
 	result, err := ValidateFile(testFile, options)
 	if err != nil {
 		b.Fatalf("Setup failed: %v", err)
@@ -298,7 +298,7 @@ func BenchmarkComparativeValidation(b *testing.B) {
 </PublicationDelivery>`)
 
 	b.Run("DefaultOptions", func(b *testing.B) {
-		options := DefaultValidationOptions().WithCodespace("COMP")
+		options := testOptions(b).WithCodespace("COMP")
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			result, err := ValidateContent(xmlData, "comp-default.xml", options)
@@ -310,7 +310,7 @@ func BenchmarkComparativeValidation(b *testing.B) {
 	})
 
 	b.Run("SkipSchema", func(b *testing.B) {
-		options := DefaultValidationOptions().
+		options := testOptions(b).
 			WithCodespace("COMP").
 			WithSkipSchema(true)
 		b.ResetTimer()
@@ -324,7 +324,7 @@ func BenchmarkComparativeValidation(b *testing.B) {
 	})
 
 	b.Run("Verbose", func(b *testing.B) {
-		options := DefaultValidationOptions().
+		options := testOptions(b).
 			WithCodespace("COMP").
 			WithVerbose(true)
 		b.ResetTimer()
@@ -338,7 +338,7 @@ func BenchmarkComparativeValidation(b *testing.B) {
 	})
 
 	b.Run("StopOnFirstError", func(b *testing.B) {
-		options := DefaultValidationOptions().
+		options := testOptions(b).
 			WithCodespace("COMP")
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {

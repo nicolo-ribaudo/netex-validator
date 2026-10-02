@@ -2,8 +2,12 @@ package validator
 
 import (
 	"github.com/theoremus-urban-solutions/netex-validator/logging"
+	"github.com/theoremus-urban-solutions/netex-validator/rules"
 	"github.com/theoremus-urban-solutions/netex-validator/types"
 )
+
+// RuleSet is a JSON rule file loaded under a namespace. See rules.RuleSet.
+type RuleSet = rules.RuleSet
 
 // ValidationOptions configures NetEX validation behavior.
 //
@@ -26,8 +30,8 @@ type ValidationOptions struct {
 	Codespace string
 
 	// ConfigFile specifies the path to a YAML configuration file for rule customization.
-	// If empty, built-in default rules are used. The config file can enable/disable
-	// specific rules and override their severity levels.
+	// The config file can enable/disable rule namespaces or specific rules and
+	// override their severity levels.
 	ConfigFile string
 
 	// SkipSchema bypasses XML schema validation for faster processing.
@@ -40,6 +44,13 @@ type ValidationOptions struct {
 	// XML structure checking without business logic validation.
 	SkipValidators bool
 
+	// RuleSets lists the JSON rule files to run as XPath business rules, in order.
+	// No rules are compiled into the validator: if RuleSets is empty, no XPath
+	// business rules are run. A single rule set with an empty Name is loaded
+	// without a namespace (rule IDs like "line/2"); otherwise each rule set is
+	// namespaced by its Name, defaulting to the file base name ("eu/line/2").
+	RuleSets []RuleSet
+
 	// MaxSchemaErrors limits the number of schema validation errors reported.
 	// Set to 0 to use the configuration default (typically 100).
 	// Higher values provide more comprehensive error reporting but may impact performance.
@@ -51,12 +62,12 @@ type ValidationOptions struct {
 	Verbose bool
 
 	// RuleOverrides allows selective enabling/disabling of validation rules.
-	// Map key is the rule code (e.g., "LINE_2", "SERVICE_JOURNEY_4"),
+	// Map key is the full rule ID (e.g., "line/2", "eu/line/2"),
 	// value indicates whether the rule should be executed.
 	RuleOverrides map[string]bool
 
 	// SeverityOverrides allows changing the severity level of specific rules.
-	// Map key is the rule code, value is the new severity level to apply.
+	// Map key is the full rule ID, value is the new severity level to apply.
 	// Useful for treating warnings as errors or vice versa based on local requirements.
 	SeverityOverrides map[string]types.Severity
 
@@ -77,7 +88,7 @@ type ValidationOptions struct {
 	// based on LogLevel and LogFormat settings.
 	Logger *logging.Logger
 
-	// Profile is deprecated; EU is the default and only supported profile.
+	// Profile is deprecated and ignored; select rules with RuleSets.
 	Profile string
 
 	// MaxFindings limits the total number of validation findings to collect (0 = unlimited).
@@ -173,13 +184,32 @@ func (o *ValidationOptions) WithCodespace(codespace string) *ValidationOptions {
 // WithConfigFile sets the path to a YAML configuration file and returns the options for chaining.
 //
 // The configuration file allows customizing validation rules, their severity levels,
-// and other validation parameters. If not specified, built-in defaults are used.
+// and other validation parameters. If not specified, rules run as defined in their files.
 //
 // Example:
 //
 //	options := DefaultValidationOptions().WithConfigFile("custom-rules.yaml")
 func (o *ValidationOptions) WithConfigFile(configFile string) *ValidationOptions {
 	o.ConfigFile = configFile
+	return o
+}
+
+// WithRuleSet adds a JSON rule file to run and returns the options for chaining.
+//
+// The name is the namespace for the rules in the file; pass "" to use the file
+// base name, or to load the file without a namespace when it is the only rule set.
+//
+// Example:
+//
+//	options := DefaultValidationOptions().WithRuleSet("", "rulesets/eu.json")
+func (o *ValidationOptions) WithRuleSet(name, path string) *ValidationOptions {
+	set := RuleSet{Name: name, Path: path}
+	for _, existing := range o.RuleSets {
+		if existing == set {
+			return o // already added, e.g. when reusing options
+		}
+	}
+	o.RuleSets = append(o.RuleSets, set)
 	return o
 }
 
@@ -215,14 +245,14 @@ func (o *ValidationOptions) WithVerbose(verbose bool) *ValidationOptions {
 // Rule codes can be found in the documentation or by examining validation results.
 //
 // Parameters:
-//   - ruleCode: The rule identifier (e.g., "LINE_2", "SERVICE_JOURNEY_4")
+//   - ruleCode: The full rule ID (e.g., "line/2", "eu/service_journey/4")
 //   - enabled: Whether the rule should be executed
 //
 // Example:
 //
 //	options := DefaultValidationOptions().
-//		WithRuleOverride("LINE_2", false).     // Disable this rule
-//		WithRuleOverride("ROUTE_3", true)      // Explicitly enable this rule
+//		WithRuleOverride("line/2", false).     // Disable this rule
+//		WithRuleOverride("route/3", true)      // Explicitly enable this rule
 func (o *ValidationOptions) WithRuleOverride(ruleCode string, enabled bool) *ValidationOptions {
 	if o.RuleOverrides == nil {
 		o.RuleOverrides = make(map[string]bool)
@@ -237,14 +267,14 @@ func (o *ValidationOptions) WithRuleOverride(ruleCode string, enabled bool) *Val
 // based on local requirements or data quality considerations.
 //
 // Parameters:
-//   - ruleCode: The rule identifier (e.g., "LINE_2", "SERVICE_JOURNEY_4")
+//   - ruleCode: The full rule ID (e.g., "line/2", "eu/service_journey/4")
 //   - severity: The new severity level (types.INFO, types.WARNING, types.ERROR, types.CRITICAL)
 //
 // Example:
 //
 //	options := DefaultValidationOptions().
-//		WithSeverityOverride("LINE_3", types.ERROR).     // Treat warning as error
-//		WithSeverityOverride("ROUTE_2", types.WARNING)   // Reduce error to warning
+//		WithSeverityOverride("line/3", types.ERROR).     // Treat warning as error
+//		WithSeverityOverride("route/2", types.WARNING)   // Reduce error to warning
 func (o *ValidationOptions) WithSeverityOverride(ruleCode string, severity types.Severity) *ValidationOptions {
 	if o.SeverityOverrides == nil {
 		o.SeverityOverrides = make(map[string]types.Severity)

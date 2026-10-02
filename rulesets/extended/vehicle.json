@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "1": {
+      "name": "VehicleType missing Name",
+      "message": "VehicleType must have a Name",
+      "severity": "ERROR",
+      "xpath": "//vehicleTypes/VehicleType[not(Name) or normalize-space(Name) = '']"
+    },
+    "2": {
+      "name": "Vehicle missing VehicleTypeRef",
+      "message": "Vehicle must reference a VehicleType",
+      "severity": "ERROR",
+      "xpath": "//vehicles/Vehicle[not(VehicleTypeRef)]"
+    },
+    "3": {
+      "name": "Block missing Name",
+      "message": "Block should have a Name",
+      "severity": "WARNING",
+      "xpath": "//blocks/Block[not(Name) or normalize-space(Name) = '']"
+    }
+  }
+}

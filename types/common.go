@@ -117,6 +117,7 @@ type ValidationIssue struct {
 
 // ValidationReportEntry represents a single entry in a validation report
 type ValidationReportEntry struct {
+	RuleID   string       `json:"ruleId,omitempty"`
 	Name     string       `json:"name"`
 	Message  string       `json:"message"`
 	Severity Severity     `json:"severity"`

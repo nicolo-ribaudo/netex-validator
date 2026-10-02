@@ -1,0 +1,24 @@
+{
+  "extends": {
+    "block": "./extended/block.json",
+    "booking": "./extended/booking.json",
+    "calendar": "./extended/calendar.json",
+    "course_of_journeys": "./extended/course_of_journeys.json",
+    "dated_service_journey": "./extended/dated_service_journey.json",
+    "dead_run": "./extended/dead_run.json",
+    "eu": "./extended/eu.json",
+    "flexible_line": "./extended/flexible_line.json",
+    "flexible_service": "./extended/flexible_service.json",
+    "frame": "./extended/frame.json",
+    "network": "./extended/network.json",
+    "notice": "./extended/notice.json",
+    "passing_time": "./extended/passing_time.json",
+    "ref": "./extended/ref.json",
+    "service_journey": "./extended/service_journey.json",
+    "stop_assignment": "./extended/stop_assignment.json",
+    "stop_place": "./extended/stop_place.json",
+    "structure": "./extended/structure.json",
+    "transport_submode": "./extended/transport_submode.json",
+    "vehicle": "./extended/vehicle.json"
+  }
+}

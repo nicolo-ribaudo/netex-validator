@@ -1,0 +1,266 @@
+{
+  "rules": {
+    "2": {
+      "name": "ServiceJourney illegal element Call",
+      "message": "ServiceJourney has illegal element Call",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/ServiceJourney/calls"
+    },
+    "3": {
+      "name": "ServiceJourney missing element PassingTimes",
+      "message": "ServiceJourney is missing PassingTimes element",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney][not(passingTimes)]"
+    },
+    "4": {
+      "name": "ServiceJourney missing arrival and departure",
+      "message": "ServiceJourney is missing both arrival and departure times. EU requirement: each TimetabledPassingTime must have at least one of ArrivalTime or DepartureTime.",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/ServiceJourney/passingTimes/TimetabledPassingTime[not(DepartureTime or EarliestDepartureTime) and not(ArrivalTime or LatestArrivalTime)]"
+    },
+    "5": {
+      "name": "ServiceJourney missing departure times",
+      "message": "ServiceJourney is missing departure times for first stop",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/ServiceJourney[not(passingTimes/TimetabledPassingTime[1]/DepartureTime) and not(passingTimes/TimetabledPassingTime[1]/EarliestDepartureTime)]"
+    },
+    "6": {
+      "name": "ServiceJourney missing arrival time for last stop",
+      "message": "ServiceJourney is missing arrival time for last stop",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/ServiceJourney[count(passingTimes/TimetabledPassingTime[last()]/ArrivalTime) = 0 and count(passingTimes/TimetabledPassingTime[last()]/LatestArrivalTime) = 0]"
+    },
+    "7": {
+      "name": "ServiceJourney identical arrival and departure",
+      "message": "ServiceJourney has identical arrival and departure times",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/ServiceJourney/passingTimes/TimetabledPassingTime[DepartureTime = ArrivalTime]"
+    },
+    "8": {
+      "name": "ServiceJourney missing id on TimetabledPassingTime",
+      "message": "ServiceJourney is missing id on TimetabledPassingTime",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/ServiceJourney/passingTimes/TimetabledPassingTime[not(@id)]"
+    },
+    "9": {
+      "name": "ServiceJourney missing version on TimetabledPassingTime",
+      "message": "ServiceJourney is missing version on TimetabledPassingTime",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/ServiceJourney/passingTimes/TimetabledPassingTime[not(@version)]"
+    },
+    "10": {
+      "name": "ServiceJourney missing reference to JourneyPattern",
+      "message": "ServiceJourney is missing reference to JourneyPattern",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney][not(JourneyPatternRef)]"
+    },
+    "11": {
+      "name": "ServiceJourney invalid overriding of transport modes",
+      "message": "ServiceJourney has invalid overriding of transport modes",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/ServiceJourney[(TransportMode and not(TransportSubmode)) or (not(TransportMode) and TransportSubmode)]"
+    },
+    "12": {
+      "name": "ServiceJourney missing OperatorRef",
+      "message": "ServiceJourney is missing OperatorRef",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/ServiceJourney[not(OperatorRef) and not(//ServiceFrame/lines/*[self::Line or self::FlexibleLine]/OperatorRef)]"
+    },
+    "13": {
+      "name": "ServiceJourney missing reference to calendar data",
+      "message": "ServiceJourney is missing reference to calendar data",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/ServiceJourney[not(dayTypes/DayTypeRef) and not(@id=//TimetableFrame/vehicleJourneys/DatedServiceJourney/ServiceJourneyRef/@ref)]"
+    },
+    "14": {
+      "name": "ServiceJourney duplicated reference to calendar data",
+      "message": "ServiceJourney has duplicated reference to calendar data",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/ServiceJourney[dayTypes/DayTypeRef and @id=//TimetableFrame/vehicleJourneys/DatedServiceJourney/ServiceJourneyRef/@ref]"
+    },
+    "15": {
+      "name": "ServiceJourney inconsistent number of timetable passing times",
+      "message": "ServiceJourney has inconsistent number of timetable passing times",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/ServiceJourney[JourneyPatternRef and count(passingTimes/TimetabledPassingTime) > 0]"
+    },
+    "16": {
+      "name": "ServiceJourney multiple versions",
+      "message": "ServiceJourney has multiple versions with same id",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/ServiceJourney[@id = preceding-sibling::ServiceJourney/@id]"
+    },
+    "17": {
+      "name": "ServiceJourney duplicate TimetabledPassingTime IDs",
+      "message": "ServiceJourney has duplicate TimetabledPassingTime IDs",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/ServiceJourney/passingTimes/TimetabledPassingTime[@id = preceding-sibling::TimetabledPassingTime/@id or @id = following-sibling::TimetabledPassingTime/@id]"
+    },
+    "1": {
+      "name": "ServiceJourney missing JourneyPatternRef",
+      "message": "ServiceJourney must reference a JourneyPattern",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney][not(JourneyPatternRef)]"
+    },
+    "2_B": {
+      "name": "ServiceJourney missing OperatorRef",
+      "message": "ServiceJourney must reference an Operator",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney][not(OperatorRef)]"
+    },
+    "3_B": {
+      "name": "ServiceJourney missing LineRef",
+      "message": "ServiceJourney must reference a Line",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney][not(LineRef)]"
+    },
+    "5_B": {
+      "name": "Missing departure time",
+      "message": "First stop must have departure time",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney]/passingTimes/TimetabledPassingTime[1][not(DepartureTime)]"
+    },
+    "6_B": {
+      "name": "Missing arrival time",
+      "message": "Last stop must have arrival time",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney]/passingTimes/TimetabledPassingTime[last()][not(ArrivalTime)]"
+    },
+    "7_B": {
+      "name": "Duplicate TimetabledPassingTime ID",
+      "message": "TimetabledPassingTime IDs must be unique within ServiceJourney",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney]/passingTimes/TimetabledPassingTime[@id = preceding-sibling::TimetabledPassingTime/@id or @id = following-sibling::TimetabledPassingTime/@id]"
+    },
+    "MISSING_PATTERN_REF": {
+      "name": "ServiceJourney missing JourneyPatternRef",
+      "message": "ServiceJourney must reference a JourneyPattern",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney][not(JourneyPatternRef)]"
+    },
+    "MISSING_LINE_REF": {
+      "name": "ServiceJourney missing LineRef",
+      "message": "ServiceJourney must reference a Line",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney][not(LineRef) and not(JourneyPatternRef)]"
+    },
+    "MISSING_OPERATOR_REF": {
+      "name": "ServiceJourney missing OperatorRef",
+      "message": "ServiceJourney must reference an Operator",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney][not(OperatorRef) and not(//lines/*[self::Line or self::FlexibleLine]/OperatorRef)]"
+    },
+    "MISSING_CALENDAR_REF": {
+      "name": "ServiceJourney missing calendar reference",
+      "message": "ServiceJourney must have calendar information",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney][not(dayTypes) and not(@id = //vehicleJourneys/DatedServiceJourney/ServiceJourneyRef/@ref)]"
+    },
+    "MISSING_NAME": {
+      "name": "ServiceJourney missing Name",
+      "message": "ServiceJourney should have a descriptive Name",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney][not(Name) or normalize-space(Name)='']"
+    },
+    "FIRST_STOP_NO_DEPARTURE": {
+      "name": "First stop missing departure time",
+      "message": "First TimetabledPassingTime must have DepartureTime",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[1][not(DepartureTime) and not(EarliestDepartureTime)]"
+    },
+    "LAST_STOP_NO_ARRIVAL": {
+      "name": "Last stop missing arrival time",
+      "message": "Last TimetabledPassingTime must have ArrivalTime",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[position()=last()][not(ArrivalTime) and not(LatestArrivalTime)]"
+    },
+    "DUPLICATE_TPT_ID": {
+      "name": "Duplicate TimetabledPassingTime ID",
+      "message": "TimetabledPassingTime IDs must be unique within ServiceJourney",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[@id = preceding-sibling::TimetabledPassingTime/@id or @id = following-sibling::TimetabledPassingTime/@id]"
+    },
+    "ARRIVAL_AFTER_DEPARTURE": {
+      "name": "Arrival time after departure time",
+      "message": "ArrivalTime should not be after DepartureTime at same stop",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[ArrivalTime and DepartureTime and ArrivalTime > DepartureTime]"
+    },
+    "TIME_REGRESSION": {
+      "name": "Service journey time regression",
+      "message": "Times should progress monotonically through the journey",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[position() > 1 and ((DepartureTime and preceding-sibling::TimetabledPassingTime[1]/DepartureTime and DepartureTime <= preceding-sibling::TimetabledPassingTime[1]/DepartureTime) or (ArrivalTime and preceding-sibling::TimetabledPassingTime[1]/ArrivalTime and ArrivalTime <= preceding-sibling::TimetabledPassingTime[1]/ArrivalTime))]"
+    },
+    "IDENTICAL_TIMES": {
+      "name": "Identical arrival and departure times",
+      "message": "ArrivalTime equals DepartureTime - verify if stop is terminal",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[ArrivalTime = DepartureTime]"
+    },
+    "UNREASONABLE_STOP_TIME": {
+      "name": "Unreasonable stop time",
+      "message": "Stop time appears unreasonable (too long or too short)",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[ArrivalTime and DepartureTime and (DepartureTime - ArrivalTime > 'PT30M' or DepartureTime - ArrivalTime < 'PT0S')]"
+    },
+    "INVALID_TIME_FORMAT": {
+      "name": "Invalid time format",
+      "message": "Time values should be valid ISO 8601 format",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime/*[self::ArrivalTime or self::DepartureTime or self::EarliestDepartureTime or self::LatestArrivalTime][not(matches(text(), '^[0-9]{2}:[0-9]{2}:[0-9]{2}$'))]"
+    },
+    "INVALID_PATTERN_REF": {
+      "name": "Invalid JourneyPatternRef",
+      "message": "JourneyPatternRef does not reference existing JourneyPattern",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/JourneyPatternRef[@ref and not(@ref = //journeyPatterns/*[self::JourneyPattern or self::ServiceJourneyPattern]/@id)]"
+    },
+    "INVALID_LINE_REF": {
+      "name": "Invalid LineRef",
+      "message": "LineRef does not reference existing Line",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/LineRef[@ref and not(@ref = //lines/*[self::Line or self::FlexibleLine]/@id)]"
+    },
+    "INVALID_OPERATOR_REF": {
+      "name": "Invalid OperatorRef",
+      "message": "OperatorRef does not reference existing Operator",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/OperatorRef[@ref and not(@ref = //organisations/Operator/@id)]"
+    },
+    "INVALID_DAYTYPE_REF": {
+      "name": "Invalid DayTypeRef",
+      "message": "DayTypeRef does not reference existing DayType",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/dayTypes/DayTypeRef[@ref and not(@ref = //dayTypes/DayType/@id)]"
+    },
+    "TPT_COUNT_MISMATCH": {
+      "name": "Inconsistent passing time count",
+      "message": "Number of TimetabledPassingTimes should match JourneyPattern StopPoints",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney][JourneyPatternRef and passingTimes and count(passingTimes/TimetabledPassingTime) != count(//journeyPatterns/*[@id=current()/JourneyPatternRef/@ref]/pointsInSequence/StopPointInJourneyPattern)]",
+      "skip": true
+    },
+    "TPT_ORDER_MISMATCH": {
+      "name": "Inconsistent passing time order",
+      "message": "TimetabledPassingTime order should match JourneyPattern order",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[position() != //journeyPatterns/*[@id=current()/../../JourneyPatternRef/@ref]/pointsInSequence/StopPointInJourneyPattern[@id=current()/StopPointInJourneyPatternRef/@ref]/@order]",
+      "skip": true
+    },
+    "INCOMPATIBLE_TRANSPORT_MODE": {
+      "name": "Incompatible transport mode",
+      "message": "ServiceJourney transport mode incompatible with Line",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney][TransportMode and LineRef and TransportMode != //lines/*[@id=current()/LineRef/@ref]/TransportMode]",
+      "skip": true
+    },
+    "INCONSISTENT_BLOCK": {
+      "name": "Inconsistent block assignment",
+      "message": "ServiceJourney block assignment should be consistent",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney][BlockRef and @id = //blocks/Block[@id != current()/BlockRef/@ref]/journeys/*/VehicleJourneyRef/@ref]",
+      "skip": true
+    }
+  }
+}

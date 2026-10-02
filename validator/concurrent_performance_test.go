@@ -18,7 +18,7 @@ func TestConcurrentValidation_StressTest(t *testing.T) {
 	}
 
 	t.Run("High concurrency validation", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithConcurrentFiles(4)
@@ -122,7 +122,7 @@ func TestConcurrentValidation_StressTest(t *testing.T) {
 		runtime.GC()
 		runtime.ReadMemStats(&m1)
 
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 
@@ -168,7 +168,7 @@ func TestConcurrentValidation_DeadlockDetection(t *testing.T) {
 	}
 
 	t.Run("Deadlock prevention", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithValidationCache(true, 100, 10, 1).
@@ -233,7 +233,7 @@ func TestConcurrentValidation_DeadlockDetection(t *testing.T) {
 func TestConcurrentValidation_ResourceContention(t *testing.T) {
 	t.Run("Resource contention under load", func(t *testing.T) {
 		// Test with limited concurrent files setting
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithConcurrentFiles(2). // Limited concurrency
@@ -314,7 +314,7 @@ func TestConcurrentValidation_ResourceContention(t *testing.T) {
 
 func TestConcurrentValidation_ErrorHandling(t *testing.T) {
 	t.Run("Concurrent error handling", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 
@@ -382,7 +382,7 @@ func TestPerformanceRegression(t *testing.T) {
 	}
 
 	t.Run("Performance baseline", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 
@@ -435,7 +435,7 @@ func TestPerformanceRegression(t *testing.T) {
 }
 
 func BenchmarkConcurrentValidation_Goroutines(b *testing.B) {
-	options := DefaultValidationOptions().
+	options := testOptions(b).
 		WithCodespace(testutil.TestCodespace).
 		WithSkipSchema(true)
 
@@ -462,7 +462,7 @@ func BenchmarkConcurrentValidation_Goroutines(b *testing.B) {
 }
 
 func BenchmarkValidation_DatasetSizes(b *testing.B) {
-	options := DefaultValidationOptions().
+	options := testOptions(b).
 		WithCodespace(testutil.TestCodespace).
 		WithSkipSchema(true)
 
@@ -499,7 +499,7 @@ func BenchmarkValidation_DatasetSizes(b *testing.B) {
 }
 
 func BenchmarkValidation_RuleComplexity(b *testing.B) {
-	options1 := DefaultValidationOptions()
+	options1 := testOptions(b)
 	options1.Codespace = testutil.TestCodespace
 	options1.SkipSchema = true
 	options1.SkipValidators = true
@@ -508,7 +508,7 @@ func BenchmarkValidation_RuleComplexity(b *testing.B) {
 		b.Fatalf("Failed to create validator: %v", err)
 	}
 
-	options2 := DefaultValidationOptions()
+	options2 := testOptions(b)
 	options2.Codespace = testutil.TestCodespace
 	options2.SkipSchema = true
 	options2.SkipValidators = false

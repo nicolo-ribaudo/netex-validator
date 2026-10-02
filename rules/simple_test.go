@@ -4,13 +4,14 @@ import (
 	"testing"
 
 	"github.com/theoremus-urban-solutions/netex-validator/config"
+	"github.com/theoremus-urban-solutions/netex-validator/testutil"
 	"github.com/theoremus-urban-solutions/netex-validator/types"
 )
 
 func TestRuleRegistryBasic(t *testing.T) {
 	t.Run("Create rule registry", func(t *testing.T) {
 		cfg := &config.ValidatorConfig{} // Minimal config
-		registry := NewRuleRegistry(cfg)
+		registry := NewRuleRegistry(cfg, nil)
 
 		if registry == nil {
 			t.Error("Expected non-nil registry")
@@ -19,14 +20,15 @@ func TestRuleRegistryBasic(t *testing.T) {
 
 	t.Run("Get all rules", func(t *testing.T) {
 		cfg := &config.ValidatorConfig{}
-		registry := NewRuleRegistry(cfg)
+		loaded, err := LoadRuleSets([]RuleSet{{Path: testutil.RuleSetPath(t, "eu")}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		registry := NewRuleRegistry(cfg, loaded)
 
-		// Should have some built-in rules
 		rules := registry.GetEnabledRules()
-		if len(rules) == 0 {
-			t.Log("No built-in rules found (this might be expected)")
-		} else {
-			t.Logf("Found %d built-in rules", len(rules))
+		if len(rules) != len(loaded) {
+			t.Errorf("Expected all %d loaded rules to be enabled, got %d", len(loaded), len(rules))
 		}
 	})
 }

@@ -1,0 +1,40 @@
+{
+  "rules": {
+    "1": {
+      "name": "DayType missing Name",
+      "message": "DayType must have a Name",
+      "severity": "ERROR",
+      "xpath": "//dayTypes/DayType[not(Name) or normalize-space(Name) = '']"
+    },
+    "2": {
+      "name": "OperatingDay missing CalendarDate",
+      "message": "OperatingDay must have CalendarDate",
+      "severity": "ERROR",
+      "xpath": "//operatingDays/OperatingDay[not(CalendarDate)]"
+    },
+    "3": {
+      "name": "ServiceCalendar missing FromDate",
+      "message": "ServiceCalendar must have FromDate",
+      "severity": "ERROR",
+      "xpath": "//serviceCalendar/ServiceCalendar[not(FromDate)]"
+    },
+    "4": {
+      "name": "ServiceCalendar missing ToDate",
+      "message": "ServiceCalendar must have ToDate",
+      "severity": "ERROR",
+      "xpath": "//serviceCalendar/ServiceCalendar[not(ToDate)]"
+    },
+    "5": {
+      "name": "Invalid date range",
+      "message": "FromDate must be before ToDate",
+      "severity": "ERROR",
+      "xpath": "//serviceCalendar/ServiceCalendar[FromDate >= ToDate]"
+    },
+    "OPERATING_PERIOD_INVALID_DATES": {
+      "name": "OperatingPeriod invalid date range",
+      "message": "OperatingPeriod FromDate must be before ToDate",
+      "severity": "ERROR",
+      "xpath": "//operatingPeriods/OperatingPeriod[FromDate >= ToDate]"
+    }
+  }
+}

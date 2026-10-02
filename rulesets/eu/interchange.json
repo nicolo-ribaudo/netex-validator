@@ -1,0 +1,58 @@
+{
+  "rules": {
+    "1": {
+      "name": "ServiceJourneyInterchange missing FromStopPointRef",
+      "message": "ServiceJourneyInterchange is missing FromStopPointRef",
+      "severity": "ERROR",
+      "xpath": "//interchanges/ServiceJourneyInterchange[not(FromStopPointRef)]"
+    },
+    "2": {
+      "name": "ServiceJourneyInterchange missing ToStopPointRef",
+      "message": "ServiceJourneyInterchange is missing ToStopPointRef",
+      "severity": "ERROR",
+      "xpath": "//interchanges/ServiceJourneyInterchange[not(ToStopPointRef)]"
+    },
+    "3": {
+      "name": "ServiceJourneyInterchange missing FromServiceJourneyRef",
+      "message": "ServiceJourneyInterchange is missing FromServiceJourneyRef",
+      "severity": "ERROR",
+      "xpath": "//interchanges/ServiceJourneyInterchange[not(FromServiceJourneyRef)]"
+    },
+    "4": {
+      "name": "ServiceJourneyInterchange missing ToServiceJourneyRef",
+      "message": "ServiceJourneyInterchange is missing ToServiceJourneyRef",
+      "severity": "ERROR",
+      "xpath": "//interchanges/ServiceJourneyInterchange[not(ToServiceJourneyRef)]"
+    },
+    "1_B": {
+      "name": "ServiceJourneyInterchange missing FromPointRef",
+      "message": "Interchange must have FromPointRef",
+      "severity": "ERROR",
+      "xpath": "//serviceJourneyInterchanges/ServiceJourneyInterchange[not(FromPointRef)]"
+    },
+    "2_B": {
+      "name": "ServiceJourneyInterchange missing ToPointRef",
+      "message": "Interchange must have ToPointRef",
+      "severity": "ERROR",
+      "xpath": "//serviceJourneyInterchanges/ServiceJourneyInterchange[not(ToPointRef)]"
+    },
+    "3_B": {
+      "name": "ServiceJourneyInterchange missing FromJourneyRef",
+      "message": "Interchange must have FromJourneyRef",
+      "severity": "ERROR",
+      "xpath": "//serviceJourneyInterchanges/ServiceJourneyInterchange[not(FromJourneyRef)]"
+    },
+    "4_B": {
+      "name": "ServiceJourneyInterchange missing ToJourneyRef",
+      "message": "Interchange must have ToJourneyRef",
+      "severity": "ERROR",
+      "xpath": "//serviceJourneyInterchanges/ServiceJourneyInterchange[not(ToJourneyRef)]"
+    },
+    "5": {
+      "name": "Invalid interchange duration",
+      "message": "Interchange duration must be positive",
+      "severity": "ERROR",
+      "xpath": "//serviceJourneyInterchanges/ServiceJourneyInterchange/StandardTransferTime[number(.) <= 0]"
+    }
+  }
+}

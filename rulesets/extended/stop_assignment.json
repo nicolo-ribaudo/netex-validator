@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "MISSING_REFS": {
+      "name": "StopAssignment missing references",
+      "message": "PassengerStopAssignment must reference both ScheduledStopPoint and StopPlace/Quay",
+      "severity": "ERROR",
+      "xpath": "//stopAssignments/PassengerStopAssignment[not(ScheduledStopPointRef) or (not(StopPlaceRef) and not(QuayRef))]"
+    }
+  }
+}

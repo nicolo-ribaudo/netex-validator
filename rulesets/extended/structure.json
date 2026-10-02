@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "PUBLICATION_DELIVERY_STRUCTURE": {
+      "name": "Invalid PublicationDelivery structure",
+      "message": "PublicationDelivery must have proper structure",
+      "severity": "ERROR",
+      "xpath": "/PublicationDelivery[not(PublicationTimestamp) or not(ParticipantRef) or not(dataObjects)]"
+    },
+    "INVALID_FRAME_NESTING": {
+      "name": "Invalid frame nesting",
+      "message": "Frames should not contain other frames of same type",
+      "severity": "ERROR",
+      "xpath": "//ServiceFrame[.//ServiceFrame] | //ResourceFrame[.//ResourceFrame] | //TimetableFrame[.//TimetableFrame]"
+    },
+    "INCONSISTENT_ELEMENT_VERSIONS": {
+      "name": "Inconsistent element versions",
+      "message": "Related elements should have consistent versions",
+      "severity": "WARNING",
+      "xpath": "//*//*[@version != 'any' and @version != ancestor::*[@version][1]/@version]"
+    }
+  }
+}

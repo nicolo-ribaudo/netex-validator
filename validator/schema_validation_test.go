@@ -21,7 +21,7 @@ func TestSchemaValidation_NetworkTimeout(t *testing.T) {
 	defer slowServer.Close()
 
 	t.Run("Schema validation with network timeout", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithAllowSchemaNetwork(true).
 			WithSchemaTimeoutSeconds(1) // 1 second timeout
@@ -69,7 +69,7 @@ func TestSchemaValidation_NetworkTimeout(t *testing.T) {
 	})
 
 	t.Run("Schema validation with network disabled", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithAllowSchemaNetwork(false) // Network disabled
 
@@ -108,7 +108,7 @@ func TestSchemaValidation_CacheDirectory(t *testing.T) {
 	t.Run("Schema caching functionality", func(t *testing.T) {
 		cacheDir := tm.CreateTempDir("schema_cache")
 
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSchemaCacheDir(cacheDir).
 			WithAllowSchemaNetwork(true)
@@ -202,7 +202,7 @@ func TestSchemaValidation_ErrorTypes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			options := DefaultValidationOptions()
+			options := testOptions(t)
 			options.Codespace = testutil.TestCodespace
 			options.SkipSchema = false
 			options.SkipValidators = true // Only test schema validation
@@ -289,7 +289,7 @@ func TestSchemaValidation_Versions(t *testing.T) {
 		t.Run("Version_"+v.version, func(t *testing.T) {
 			xmlContent := strings.ReplaceAll(testutil.NetEXTestFragment, `version="1.15"`, `version="`+v.version+`"`)
 
-			options := DefaultValidationOptions().
+			options := testOptions(t).
 				WithCodespace(testutil.TestCodespace).
 				WithSkipSchema(true) // Skip schema to focus on version detection
 
@@ -325,7 +325,7 @@ func TestSchemaValidation_Versions(t *testing.T) {
 }
 
 func BenchmarkSchemaValidation(b *testing.B) {
-	options := DefaultValidationOptions()
+	options := testOptions(b)
 	options.Codespace = testutil.TestCodespace
 	options.SkipSchema = false
 	options.SkipValidators = true

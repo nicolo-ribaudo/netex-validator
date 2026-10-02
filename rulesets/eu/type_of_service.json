@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "1": {
+      "name": "TypeOfService missing Name",
+      "message": "TypeOfService is missing Name",
+      "severity": "WARNING",
+      "xpath": "//TypeOfService[not(Name) or normalize-space(Name) = '']"
+    }
+  }
+}

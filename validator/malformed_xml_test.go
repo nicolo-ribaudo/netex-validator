@@ -222,7 +222,7 @@ func TestMalformedXML_Recovery(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			options := DefaultValidationOptions()
+			options := testOptions(t)
 			options.Codespace = testutil.TestCodespace
 			options.SkipSchema = false // Test schema validation with malformed XML
 
@@ -291,7 +291,7 @@ func TestMalformedXML_LargeFiles(t *testing.T) {
 		// Missing final closing tag to make it malformed
 		// content.WriteString(`</PublicationDelivery>`)
 
-		options := DefaultValidationOptions()
+		options := testOptions(t)
 		options.Codespace = testutil.TestCodespace
 
 		validator, err := NewWithOptions(options)
@@ -354,7 +354,7 @@ func TestMalformedXML_EncodingIssues(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			options := DefaultValidationOptions()
+			options := testOptions(t)
 			options.Codespace = testutil.TestCodespace
 
 			validator, err := NewWithOptions(options)
@@ -407,7 +407,7 @@ func TestMalformedXML_RecoveryStrategies(t *testing.T) {
 	</dataObjects>
 </PublicationDelivery>`
 
-		options := DefaultValidationOptions()
+		options := testOptions(t)
 		options.Codespace = testutil.TestCodespace
 
 		validator, err := NewWithOptions(options)
@@ -440,7 +440,7 @@ func TestMalformedXML_RecoveryStrategies(t *testing.T) {
 	<ParticipantRef>TEST</ParticipantRef>
 </PublicationDelivery>`
 
-		options := DefaultValidationOptions()
+		options := testOptions(t)
 		options.Codespace = testutil.TestCodespace
 
 		validator, err := NewWithOptions(options)
@@ -471,7 +471,7 @@ func BenchmarkMalformedXML_HandlingPerformance(b *testing.B) {
 		</ServiceFrame>
 	</dataObjects>`
 
-	options := DefaultValidationOptions()
+	options := testOptions(b)
 	options.Codespace = testutil.TestCodespace
 
 	validator, err := NewWithOptions(options)

@@ -40,6 +40,8 @@ type ValidationResult struct {
 
 // ValidationReportEntry represents a single validation issue
 type ValidationReportEntry struct {
+	// RuleID is the full rule ID, e.g. "line/2" or "eu/line/2" for rules from JSON rule sets
+	RuleID   string                   `json:"ruleId,omitempty"`
 	Name     string                   `json:"name"`
 	Message  string                   `json:"message"`
 	Severity types.Severity           `json:"severity"`

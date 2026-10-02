@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "1": {
+      "name": "StopPoint missing ScheduledStopPointRef",
+      "message": "StopPoint is missing ScheduledStopPointRef",
+      "severity": "ERROR",
+      "xpath": "//StopPointInJourneyPattern[not(ScheduledStopPointRef)]"
+    },
+    "2": {
+      "name": "StopPoint missing order",
+      "message": "StopPoint is missing order attribute",
+      "severity": "ERROR",
+      "xpath": "//StopPointInJourneyPattern[not(@order)]"
+    },
+    "SCHEDULED_STOP_POINT_1": {
+      "name": "ScheduledStopPoint missing Name",
+      "message": "ScheduledStopPoint is missing Name",
+      "severity": "WARNING",
+      "xpath": "//scheduledStopPoints/ScheduledStopPoint[not(Name) or normalize-space(Name) = '']"
+    },
+    "ORDER_MISSING": {
+      "name": "StopPoint missing order",
+      "message": "StopPointInJourneyPattern must have order attribute",
+      "severity": "ERROR",
+      "xpath": "//journeyPatterns/*/pointsInSequence/StopPointInJourneyPattern[not(@order)]"
+    }
+  }
+}

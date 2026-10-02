@@ -1,0 +1,46 @@
+{
+  "rules": {
+    "1": {
+      "name": "StopPlace missing Name",
+      "message": "StopPlace must have a Name",
+      "severity": "ERROR",
+      "xpath": "//stopPlaces/StopPlace[not(Name) or normalize-space(Name) = '']"
+    },
+    "2": {
+      "name": "StopPlace missing Centroid",
+      "message": "StopPlace should have location coordinates",
+      "severity": "WARNING",
+      "xpath": "//stopPlaces/StopPlace[not(Centroid)]"
+    },
+    "3": {
+      "name": "Quay missing Name",
+      "message": "Quay must have a Name",
+      "severity": "ERROR",
+      "xpath": "//stopPlaces/StopPlace/quays/Quay[not(Name) or normalize-space(Name) = '']"
+    },
+    "4": {
+      "name": "Quay missing Centroid",
+      "message": "Quay should have location coordinates",
+      "severity": "WARNING",
+      "xpath": "//stopPlaces/StopPlace/quays/Quay[not(Centroid)]"
+    },
+    "5": {
+      "name": "Invalid StopPlaceType",
+      "message": "StopPlace has invalid type",
+      "severity": "ERROR",
+      "xpath": "//stopPlaces/StopPlace/StopPlaceType[not(text() = 'onstreetBus' or text() = 'onstreetTram' or text() = 'airport' or text() = 'railStation' or text() = 'metroStation' or text() = 'busStation' or text() = 'coachStation' or text() = 'tramStation' or text() = 'harbourPort' or text() = 'ferryPort' or text() = 'ferryStop' or text() = 'liftStation' or text() = 'vehicleRailInterchange' or text() = 'other')]"
+    },
+    "NO_LOCATION": {
+      "name": "StopPlace missing location",
+      "message": "StopPlace should have geographic coordinates",
+      "severity": "WARNING",
+      "xpath": "//stopPlaces/StopPlace[not(Centroid) and not(gml:Point) and not(Location)]"
+    },
+    "QUAY_NO_LOCATION": {
+      "name": "Quay missing location",
+      "message": "Quay should have geographic coordinates",
+      "severity": "WARNING",
+      "xpath": "//stopPlaces/StopPlace/quays/Quay[not(Centroid) and not(gml:Point) and not(Location)]"
+    }
+  }
+}

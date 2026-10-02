@@ -646,6 +646,7 @@ func NewDefaultValidationReportEntryFactory() interfaces.ValidationReportEntryFa
 // CreateValidationReportEntry creates a validation report entry from an issue
 func (f *DefaultValidationReportEntryFactory) CreateValidationReportEntry(issue types.ValidationIssue) types.ValidationReportEntry {
 	return types.ValidationReportEntry{
+		RuleID:   issue.Rule.Code,
 		Name:     issue.Rule.Name,
 		Message:  issue.Message,
 		Severity: issue.Rule.Severity,
@@ -657,6 +658,7 @@ func (f *DefaultValidationReportEntryFactory) CreateValidationReportEntry(issue 
 // TemplateValidationReportEntry creates a template entry from a rule
 func (f *DefaultValidationReportEntryFactory) TemplateValidationReportEntry(rule types.ValidationRule) types.ValidationReportEntry {
 	return types.ValidationReportEntry{
+		RuleID:   rule.Code,
 		Name:     rule.Name,
 		Message:  rule.Message,
 		Severity: rule.Severity,

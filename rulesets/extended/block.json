@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "1": {
+      "name": "Block missing Name",
+      "message": "Block is missing Name",
+      "severity": "WARNING",
+      "xpath": "//blocks/Block[not(Name) or normalize-space(Name) = '']"
+    },
+    "2": {
+      "name": "Block missing vehicleJourneys",
+      "message": "Block is missing vehicleJourneys",
+      "severity": "ERROR",
+      "xpath": "//blocks/Block[not(journeys)]"
+    },
+    "NO_JOURNEYS": {
+      "name": "Block without journeys",
+      "message": "Block must contain at least one journey",
+      "severity": "ERROR",
+      "xpath": "//blocks/Block[not(journeys) or count(journeys/*) = 0]"
+    }
+  }
+}

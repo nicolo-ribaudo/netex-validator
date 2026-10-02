@@ -1,5 +1,9 @@
 # NetEX Validator Go Implementation - Validation Capabilities
 
+> **Note:** XPath business rules are no longer defined in Go code. They live in JSON rule files under
+> [`rulesets/`](rulesets/) (`rulesets/eu.json`: 73 active rules, `rulesets/extended.json`: 164 more) and are
+> loaded with `--rules`; see the README. The categories below describe the rules, not source files.
+
 ## 📊 Rule Coverage Summary
 
 | Category | Go Implementation | Java Implementation | Coverage |
@@ -18,7 +22,7 @@ The Go implementation now has **more comprehensive validation** than the Java ve
 
 ## 📋 Detailed Rule Categories
 
-### 1. Core Validation Rules (builtin.go)
+### 1. Core Validation Rules
 - **LINE validation**: 9 comprehensive rules
 - **ROUTE validation**: 7 rules including topology validation  
 - **SERVICE_JOURNEY validation**: 17 rules with timing consistency
@@ -28,7 +32,7 @@ The Go implementation now has **more comprehensive validation** than the Java ve
 - **JOURNEY_PATTERN validation**: 2 structural rules
 - **Additional elements**: 50+ rules for stops, transport modes, calendar, etc.
 
-### 2. Extended Validation Rules (extended_builtin.go)
+### 2. Extended Validation Rules
 - **Transport mode validation**: 15+ rules with submode consistency
 - **Booking validation**: 8 rules for flexible services
 - **Service journey enhancements**: 10+ additional timing rules
@@ -41,7 +45,7 @@ The Go implementation now has **more comprehensive validation** than the Java ve
 - **Interchange validation**: 5 connection rules
 - **Cross-frame references**: 10+ consistency rules
 
-### 3. Advanced Transport Rules (advanced_transport_rules.go)
+### 3. Advanced Transport Rules
 - **Basic transport mode validation**: 5 fundamental rules
 - **Bus submode validation**: 17+ specific submodes
 - **Rail submode validation**: 13+ rail-specific submodes
@@ -53,7 +57,7 @@ The Go implementation now has **more comprehensive validation** than the Java ve
 - **Other transport submodes**: 15+ taxi, cableway, funicular rules
 - **Contextual validation**: 4 cross-element consistency rules
 
-### 4. Service Journey Rules (service_journey_rules.go)
+### 4. Service Journey Rules
 - **Basic service journey**: 5 fundamental validation rules
 - **Timetabled passing times**: 6 timing structure rules
 - **Service journey timing**: 5 temporal consistency rules
@@ -62,7 +66,7 @@ The Go implementation now has **more comprehensive validation** than the Java ve
 - **Journey pattern consistency**: 4 structural alignment rules
 - **Service journey interchanges**: 6 connection rules
 
-### 5. Flexible Service Rules (flexible_service_rules.go)
+### 5. Flexible Service Rules
 - **FlexibleLine validation**: 4 flexible line structure rules
 - **Booking properties**: 10 booking arrangement validation rules
 - **FlexibleService validation**: 4 flexible service type rules
@@ -70,7 +74,7 @@ The Go implementation now has **more comprehensive validation** than the Java ve
 - **Flexible areas**: 4 geographic boundary rules
 - **Flexible service journeys**: 3 timing integration rules
 
-### 6. XPath Business Rules (xpath_business_rules.go)
+### 6. XPath Business Rules
 - **Mandatory fields**: 15+ comprehensive field validation rules
 - **Structural validation**: 10+ hierarchy and ordering rules
 - **Data consistency**: 10+ cross-element consistency rules
@@ -78,7 +82,7 @@ The Go implementation now has **more comprehensive validation** than the Java ve
 - **Advanced references**: 5+ complex reference validation rules
 - **Documentation examples**: 3 complex multi-element rules
 
-### 7. Additional ID Rules (additional_id_rules.go)
+### 7. Additional ID Rules
 - **NETEX_ID_2**: Local element version validation
 - **NETEX_ID_3**: External reference version requirements
 - **NETEX_ID_4**: Version format validation

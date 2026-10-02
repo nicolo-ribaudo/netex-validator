@@ -1,0 +1,100 @@
+{
+  "rules": {
+    "1": {
+      "name": "Missing transport submode",
+      "message": "Transport submode is required when transport mode is specified",
+      "severity": "WARNING",
+      "xpath": "//*/TransportMode[text() != 'unknown' and not(following-sibling::TransportSubmode or preceding-sibling::TransportSubmode)]"
+    },
+    "2": {
+      "name": "Inconsistent transport mode and submode",
+      "message": "Transport submode does not match transport mode",
+      "severity": "ERROR",
+      "xpath": "//*/TransportMode[text()='bus']/following-sibling::TransportSubmode[not(text() = 'localBus' or text() = 'expressBus' or text() = 'nightBus' or text() = 'postBus' or text() = 'specialNeedsBus' or text() = 'mobilityBus' or text() = 'mobilityBusForRegisteredDisabled' or text() = 'sightseeingBus' or text() = 'shuttleBus' or text() = 'highFrequencyBus' or text() = 'dedicatedLaneBus' or text() = 'schoolBus' or text() = 'schoolAndPublicBus' or text() = 'railReplacementBus' or text() = 'demandAndResponseBus' or text() = 'airportLinkBus')]"
+    },
+    "BUS_INVALID_LINE": {
+      "name": "Invalid bus submode on Line",
+      "message": "Line with bus transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode='bus']/TransportSubmode[not(text() = 'localBus' or text() = 'regionalBus' or text() = 'expressBus' or text() = 'nightBus' or text() = 'postBus' or text() = 'specialNeedsBus' or text() = 'mobilityBus' or text() = 'mobilityBusForRegisteredDisabled' or text() = 'sightseeingBus' or text() = 'shuttleBus' or text() = 'schoolBus' or text() = 'schoolAndPublicServiceBus' or text() = 'railReplacementBus' or text() = 'demandAndResponseBus' or text() = 'airportLinkBus' or text() = 'highFrequencyBus' or text() = 'dedicatedLaneBus')]"
+    },
+    "BUS_INVALID_SERVICE_JOURNEY": {
+      "name": "Invalid bus submode on ServiceJourney",
+      "message": "ServiceJourney with bus transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney][TransportMode='bus']/TransportSubmode[not(text() = 'localBus' or text() = 'regionalBus' or text() = 'expressBus' or text() = 'nightBus' or text() = 'postBus' or text() = 'specialNeedsBus' or text() = 'mobilityBus' or text() = 'mobilityBusForRegisteredDisabled' or text() = 'sightseeingBus' or text() = 'shuttleBus' or text() = 'schoolBus' or text() = 'schoolAndPublicServiceBus' or text() = 'railReplacementBus' or text() = 'demandAndResponseBus' or text() = 'airportLinkBus' or text() = 'highFrequencyBus' or text() = 'dedicatedLaneBus')]"
+    },
+    "RAIL_INVALID_LINE": {
+      "name": "Invalid rail submode on Line",
+      "message": "Line with rail transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode='rail']/TransportSubmode[not(text() = 'local' or text() = 'highSpeedRail' or text() = 'suburbanRailway' or text() = 'regionalRail' or text() = 'interregionalRail' or text() = 'longDistance' or text() = 'international' or text() = 'sleeperRailService' or text() = 'nightRail' or text() = 'carTransportRailService' or text() = 'touristRailway' or text() = 'railShuttle' or text() = 'rackAndPinionRailway')]"
+    },
+    "RAIL_INVALID_SERVICE_JOURNEY": {
+      "name": "Invalid rail submode on ServiceJourney",
+      "message": "ServiceJourney with rail transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney][TransportMode='rail']/TransportSubmode[not(text() = 'local' or text() = 'highSpeedRail' or text() = 'suburbanRailway' or text() = 'regionalRail' or text() = 'interregionalRail' or text() = 'longDistance' or text() = 'international' or text() = 'sleeperRailService' or text() = 'nightRail' or text() = 'carTransportRailService' or text() = 'touristRailway' or text() = 'railShuttle' or text() = 'rackAndPinionRailway')]"
+    },
+    "TRAM_INVALID_LINE": {
+      "name": "Invalid tram submode on Line",
+      "message": "Line with tram transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode='tram']/TransportSubmode[not(text() = 'cityTram' or text() = 'localTram' or text() = 'regionalTram' or text() = 'sightseeingTram' or text() = 'shuttleTram' or text() = 'trainTram')]"
+    },
+    "TRAM_INVALID_SERVICE_JOURNEY": {
+      "name": "Invalid tram submode on ServiceJourney",
+      "message": "ServiceJourney with tram transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney][TransportMode='tram']/TransportSubmode[not(text() = 'cityTram' or text() = 'localTram' or text() = 'regionalTram' or text() = 'sightseeingTram' or text() = 'shuttleTram' or text() = 'trainTram')]"
+    },
+    "METRO_INVALID_LINE": {
+      "name": "Invalid metro submode on Line",
+      "message": "Line with metro transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode='metro']/TransportSubmode[not(text() = 'metro' or text() = 'tube' or text() = 'urbanRailway')]"
+    },
+    "WATER_INVALID_LINE": {
+      "name": "Invalid water submode on Line",
+      "message": "Line with water transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode='water']/TransportSubmode[not(text() = 'internationalCarFerry' or text() = 'nationalCarFerry' or text() = 'regionalCarFerry' or text() = 'localCarFerry' or text() = 'internationalPassengerFerry' or text() = 'nationalPassengerFerry' or text() = 'regionalPassengerFerry' or text() = 'localPassengerFerry' or text() = 'postBoat' or text() = 'trainFerry' or text() = 'roadFerryLink' or text() = 'airportBoatLink' or text() = 'highSpeedVehicleService' or text() = 'highSpeedPassengerService' or text() = 'sightseeingService' or text() = 'schoolBoat' or text() = 'cableFerry' or text() = 'riverBus' or text() = 'scheduledFerry' or text() = 'shuttleFerryService')]"
+    },
+    "AIR_INVALID_LINE": {
+      "name": "Invalid air submode on Line",
+      "message": "Line with air transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode='air']/TransportSubmode[not(text() = 'internationalFlight' or text() = 'domesticFlight' or text() = 'intercontinentalFlight' or text() = 'domesticScheduledFlight' or text() = 'shuttleFlight' or text() = 'intercontinentalCharterFlight' or text() = 'internationalCharterFlight' or text() = 'roundTripCharterFlight' or text() = 'sightseeingFlight' or text() = 'helicopterService' or text() = 'domesticCharterFlight' or text() = 'SchengenAreaFlight' or text() = 'airshipService' or text() = 'shortHaulInternationalFlight')]"
+    },
+    "COACH_INVALID_LINE": {
+      "name": "Invalid coach submode on Line",
+      "message": "Line with coach transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode='coach']/TransportSubmode[not(text() = 'internationalCoach' or text() = 'nationalCoach' or text() = 'shuttleCoach' or text() = 'regionalCoach' or text() = 'specialCoach' or text() = 'schoolCoach' or text() = 'sightseeingCoach' or text() = 'touristCoach' or text() = 'commuterCoach')]"
+    },
+    "TAXI_INVALID_LINE": {
+      "name": "Invalid taxi submode on Line",
+      "message": "Line with taxi transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode='taxi']/TransportSubmode[not(text() = 'communalTaxi' or text() = 'waterTaxi' or text() = 'railTaxi' or text() = 'bikeTaxi' or text() = 'licensedTaxi' or text() = 'privateTaxi' or text() = 'allTaxiServices')]"
+    },
+    "CABLEWAY_INVALID_LINE": {
+      "name": "Invalid cableway submode on Line",
+      "message": "Line with cableway transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode='cableway']/TransportSubmode[not(text() = 'telecabin' or text() = 'cableCar' or text() = 'lift' or text() = 'chairLift' or text() = 'dragLift' or text() = 'smallTelecabin')]"
+    },
+    "FUNICULAR_INVALID_LINE": {
+      "name": "Invalid funicular submode on Line",
+      "message": "Line with funicular transport has invalid TransportSubmode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode='funicular']/TransportSubmode[not(text()='funicular')]"
+    },
+    "WITHOUT_MODE": {
+      "name": "Transport submode without mode",
+      "message": "TransportSubmode specified without TransportMode",
+      "severity": "WARNING",
+      "xpath": "//*/TransportSubmode[not(../TransportMode)]"
+    }
+  }
+}

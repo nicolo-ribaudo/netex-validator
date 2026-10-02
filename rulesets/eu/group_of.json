@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "LINES_1": {
+      "name": "GroupOfLines missing Name",
+      "message": "GroupOfLines is missing Name",
+      "severity": "ERROR",
+      "xpath": "//groupsOfLines/GroupOfLines[not(Name) or normalize-space(Name) = '']"
+    },
+    "SERVICES_1": {
+      "name": "GroupOfServices missing Name",
+      "message": "GroupOfServices is missing Name",
+      "severity": "WARNING",
+      "xpath": "//GroupOfServices[not(Name) or normalize-space(Name) = '']"
+    }
+  }
+}

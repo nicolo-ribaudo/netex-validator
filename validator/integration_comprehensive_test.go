@@ -56,7 +56,7 @@ func TestValidator_ComprehensiveIntegration(t *testing.T) {
 		xmlFile := tm.CreateTestXMLFile(t, "comprehensive.xml", xmlContent)
 
 		// Use test-friendly options: skip schema to avoid network timeouts, focus on business logic
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 		result, err := ValidateFile(xmlFile, options)
@@ -109,7 +109,7 @@ func TestValidator_ComprehensiveIntegration(t *testing.T) {
 
 		zipFile := tm.CreateTestZipFile(t, "dataset.zip", files)
 		// Use test-friendly options: skip schema to avoid network timeouts
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 		result, err := ValidateZip(zipFile, options)
@@ -135,11 +135,11 @@ func TestValidator_ComprehensiveIntegration(t *testing.T) {
 		}{
 			{
 				name:    "Default options",
-				options: DefaultValidationOptions().WithCodespace(testutil.TestCodespace),
+				options: testOptions(t).WithCodespace(testutil.TestCodespace),
 			},
 			{
 				name: "Schema validation disabled",
-				options: DefaultValidationOptions().
+				options: testOptions(t).
 					WithCodespace(testutil.TestCodespace).
 					WithSkipSchema(true),
 			},
@@ -155,7 +155,7 @@ func TestValidator_ComprehensiveIntegration(t *testing.T) {
 			},
 			{
 				name: "Limited findings",
-				options: DefaultValidationOptions().
+				options: testOptions(t).
 					WithCodespace(testutil.TestCodespace).
 					WithMaxFindings(5).
 					WithVerbose(true),
@@ -187,7 +187,7 @@ func TestValidator_ComprehensiveIntegration(t *testing.T) {
 
 	t.Run("Error handling and edge cases", func(t *testing.T) {
 		// Test invalid file path - should return result with error message, not Go error
-		result, err := ValidateFile("/non/existent/file.xml", DefaultValidationOptions().WithCodespace(testutil.TestCodespace))
+		result, err := ValidateFile("/non/existent/file.xml", testOptions(t).WithCodespace(testutil.TestCodespace))
 		if err != nil {
 			t.Errorf("Unexpected Go error for non-existent file: %v", err)
 		}
@@ -197,7 +197,7 @@ func TestValidator_ComprehensiveIntegration(t *testing.T) {
 
 		// Test malformed XML - should handle gracefully with validation result
 		malformedFile := tm.CreateTestXMLFile(t, "malformed.xml", "<invalid>xml<content>")
-		result, err = ValidateFile(malformedFile, DefaultValidationOptions().WithCodespace(testutil.TestCodespace))
+		result, err = ValidateFile(malformedFile, testOptions(t).WithCodespace(testutil.TestCodespace))
 		if err != nil {
 			t.Errorf("Unexpected Go error for malformed XML: %v", err)
 		}
@@ -207,7 +207,7 @@ func TestValidator_ComprehensiveIntegration(t *testing.T) {
 		}
 
 		// Test empty codespace - should work but may produce different validation behavior
-		result, err = ValidateFile(tm.CreateTestXMLFile(t, "test.xml", testutil.NetEXTestFragment), DefaultValidationOptions().WithCodespace(""))
+		result, err = ValidateFile(tm.CreateTestXMLFile(t, "test.xml", testutil.NetEXTestFragment), testOptions(t).WithCodespace(""))
 		if err != nil {
 			t.Errorf("Unexpected Go error for empty codespace: %v", err)
 		}
@@ -235,7 +235,7 @@ func TestValidator_ComprehensiveIntegration(t *testing.T) {
 
 				start := time.Now()
 				// Use test-friendly options: skip schema to avoid network timeouts, focus on business logic
-				options := DefaultValidationOptions().
+				options := testOptions(t).
 					WithCodespace(testutil.TestCodespace).
 					WithSkipSchema(true)
 				result, err := ValidateFile(xmlFile, options)
@@ -260,7 +260,7 @@ func TestValidator_ComprehensiveIntegration(t *testing.T) {
 	t.Run("Output format validation", func(t *testing.T) {
 		xmlFile := tm.CreateTestXMLFile(t, "output_test.xml", testutil.NetEXTestFragment)
 		// Use test-friendly options: skip schema to avoid network timeouts, focus on business logic
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 		result, err := ValidateFile(xmlFile, options)
@@ -335,7 +335,7 @@ func TestValidator_ComprehensiveIntegration(t *testing.T) {
 
 		zipFile := tm.CreateTestZipFile(t, "crossref.zip", files)
 		// Use test-friendly options: skip schema to avoid network timeouts
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 		result, err := ValidateZip(zipFile, options)
@@ -370,7 +370,7 @@ func TestValidator_RealWorldDataCompatibility(t *testing.T) {
 	if fileExists(fluoZipPath) {
 		t.Run("FLUO Grand Est dataset", func(t *testing.T) {
 			// Use test-friendly options: skip schema to avoid network timeouts
-			options := DefaultValidationOptions().
+			options := testOptions(t).
 				WithCodespace("FLUO_GRAND_EST").
 				WithSkipSchema(true)
 			result, err := ValidateZip(fluoZipPath, options)
@@ -415,7 +415,7 @@ func TestValidator_ConcurrentValidation(t *testing.T) {
 
 		for _, file := range files {
 			go func(f string) {
-				result, err := ValidateFile(f, DefaultValidationOptions().WithCodespace(testutil.TestCodespace))
+				result, err := ValidateFile(f, testOptions(t).WithCodespace(testutil.TestCodespace))
 				if err != nil {
 					errors <- err
 				} else {
@@ -609,7 +609,7 @@ func BenchmarkValidator_Integration_SmallFile(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := ValidateFile(xmlFile, DefaultValidationOptions().WithCodespace(testutil.TestCodespace))
+		_, err := ValidateFile(xmlFile, testOptions(b).WithCodespace(testutil.TestCodespace))
 		if err != nil {
 			b.Fatalf("Validation failed: %v", err)
 		}
@@ -633,7 +633,7 @@ func BenchmarkValidator_Integration_MediumFile(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := ValidateFile(xmlFile, DefaultValidationOptions().WithCodespace(testutil.TestCodespace))
+		_, err := ValidateFile(xmlFile, testOptions(b).WithCodespace(testutil.TestCodespace))
 		if err != nil {
 			b.Fatalf("Validation failed: %v", err)
 		}
@@ -684,7 +684,7 @@ func BenchmarkValidator_Integration_ZipDataset(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		// Use test-friendly options: skip schema to avoid network timeouts
-		options := DefaultValidationOptions().
+		options := testOptions(b).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true)
 		_, err := ValidateZip(zipFile, options)

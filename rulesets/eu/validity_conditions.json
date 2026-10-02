@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "1": {
+      "name": "ValidityConditions missing AvailabilityCondition",
+      "message": "ValidityConditions is missing AvailabilityCondition",
+      "severity": "WARNING",
+      "xpath": "//validityConditions[not(AvailabilityCondition)]"
+    },
+    "2": {
+      "name": "ValidityConditions invalid FromDate",
+      "message": "ValidityConditions has invalid FromDate",
+      "severity": "ERROR",
+      "xpath": "//validityConditions/AvailabilityCondition[FromDate]"
+    }
+  }
+}

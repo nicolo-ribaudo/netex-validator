@@ -1,0 +1,64 @@
+{
+  "rules": {
+    "2": {
+      "name": "Line missing Name",
+      "message": "Line is missing Name. EU requirement: provide <Name> for every Line to ensure human-readable identification.",
+      "severity": "ERROR",
+      "xpath": "//*[local-name()='lines']/*[local-name()='Line' or local-name()='FlexibleLine'][not(*[local-name()='Name']) or normalize-space(*[local-name()='Name'])='']"
+    },
+    "3": {
+      "name": "Line missing PublicCode",
+      "message": "Line is missing PublicCode",
+      "severity": "WARNING",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][not(PublicCode) or normalize-space(PublicCode) = '']"
+    },
+    "4": {
+      "name": "Line missing TransportMode",
+      "message": "Line is missing TransportMode. EU requirement: set <TransportMode> to a valid value (bus, rail, tram, metro, air, water, taxi, cableway, funicular, coach).",
+      "severity": "ERROR",
+      "xpath": "//*[local-name()='lines']/*[local-name()='Line' or local-name()='FlexibleLine'][not(*[local-name()='TransportMode'])]"
+    },
+    "5": {
+      "name": "Line missing TransportSubmode",
+      "message": "Line is missing TransportSubmode",
+      "severity": "WARNING",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][not(TransportSubmode)]"
+    },
+    "6": {
+      "name": "Line with incorrect use of Route",
+      "message": "Line has incorrect use of Route element",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine]/routes/Route"
+    },
+    "7": {
+      "name": "Line missing Network or GroupOfLines",
+      "message": "Line is missing reference to Network or GroupOfLines",
+      "severity": "WARNING",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][not(RepresentedByGroupRef)]"
+    },
+    "8": {
+      "name": "Line missing OperatorRef",
+      "message": "Line is missing OperatorRef",
+      "severity": "WARNING",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][not(OperatorRef)]"
+    },
+    "9": {
+      "name": "Line missing AuthorityRef",
+      "message": "Line is missing AuthorityRef",
+      "severity": "WARNING",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][not(AuthorityRef)]"
+    },
+    "INVALID_COLOR_LENGTH": {
+      "name": "Line with invalid color coding length",
+      "message": "Line has invalid color coding length on Presentation",
+      "severity": "WARNING",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine]/*[self::Presentation or self::AlternativePresentation]/*[self::Colour or self::TextColour][text()]"
+    },
+    "INVALID_COLOR_VALUE": {
+      "name": "Line with invalid color coding value",
+      "message": "Line has invalid color coding value on Presentation",
+      "severity": "WARNING",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine]/*[self::Presentation or self::AlternativePresentation]/*[self::Colour or self::TextColour][text()]"
+    }
+  }
+}

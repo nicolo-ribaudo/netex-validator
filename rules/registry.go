@@ -7,39 +7,31 @@ import (
 
 // Rule represents a single validation rule
 type Rule struct {
-	Code        string
-	Name        string
-	Message     string
-	Severity    types.Severity
-	XPath       string
+	// Code is the full rule ID: the namespace path and Key joined with "/".
+	Code     string
+	Key      string
+	Name     string
+	Message  string
+	Severity types.Severity
+	XPath    string
+	// Category is the namespace path the rule was loaded under (may be empty).
 	Category    string
 	Description string
 }
 
 // RuleRegistry manages all validation rules
 type RuleRegistry struct {
-	rules   []Rule
-	config  *config.ValidatorConfig
-	profile string
+	rules  []Rule
+	config *config.ValidatorConfig
 }
 
-// NewRuleRegistry creates a new rule registry with all built-in rules
-func NewRuleRegistry(cfg *config.ValidatorConfig) *RuleRegistry {
-	registry := &RuleRegistry{
-		rules:  make([]Rule, 0),
+// NewRuleRegistry creates a new rule registry holding the given rules,
+// typically loaded with LoadRuleSets.
+func NewRuleRegistry(cfg *config.ValidatorConfig, rules []Rule) *RuleRegistry {
+	return &RuleRegistry{
+		rules:  rules,
 		config: cfg,
 	}
-
-	// Load all built-in rules
-	registry.loadBuiltinRules()
-
-	return registry
-}
-
-// WithProfile allows selecting a ruleset profile (e.g., "eu", "custom").
-func (r *RuleRegistry) WithProfile(profile string) *RuleRegistry {
-	r.profile = profile
-	return r
 }
 
 // GetEnabledRules returns all enabled rules based on configuration
@@ -47,14 +39,9 @@ func (r *RuleRegistry) GetEnabledRules() []Rule {
 	var enabled []Rule
 
 	for _, rule := range r.rules {
-		// Filter by profile: for EU, include only generic EU-safe categories
-		if r.profile == "eu" && !isEUCategory(rule.Category) {
-			continue
-		}
-		if r.config.IsRuleEnabled(rule.Code) {
+		if r.config.IsRuleEnabled(rule.Category, rule.Key) {
 			// Apply severity overrides from config
-			effectiveSeverity := r.config.GetRuleSeverity(rule.Code, rule.Severity)
-			rule.Severity = effectiveSeverity
+			rule.Severity = r.config.GetRuleSeverity(rule.Category, rule.Key, rule.Severity)
 			enabled = append(enabled, rule)
 		}
 	}
@@ -63,6 +50,7 @@ func (r *RuleRegistry) GetEnabledRules() []Rule {
 	for _, customRule := range r.config.GetCustomRules() {
 		enabled = append(enabled, Rule{
 			Code:     customRule.Code,
+			Key:      customRule.Code,
 			Name:     customRule.Name,
 			Message:  customRule.Message,
 			Severity: customRule.Severity,
@@ -72,17 +60,6 @@ func (r *RuleRegistry) GetEnabledRules() []Rule {
 	}
 
 	return enabled
-}
-
-// isEUCategory returns true if a rule category is part of the generic EU profile
-func isEUCategory(category string) bool {
-	// Conservative allow-list; expand as EU set is curated
-	switch category {
-	case "line", "route", "transport_mode", "version", "journey_pattern", "stop_point", "calendar", "validity", "interchange", "group", "tariff_zone", "responsibility_set", "type_of_service":
-		return true
-	default:
-		return false
-	}
 }
 
 // GetRuleByCode returns a specific rule by its code
@@ -122,70 +99,4 @@ func (r *RuleRegistry) GetAllCategories() []string {
 	}
 
 	return result
-}
-
-// addRule is a helper function to add a rule to the registry
-func (r *RuleRegistry) addRule(code, name, message string, severity types.Severity, xpath string) {
-	rule := Rule{
-		Code:     code,
-		Name:     name,
-		Message:  message,
-		Severity: severity,
-		XPath:    xpath,
-		Category: r.getCategoryFromCode(code),
-	}
-
-	r.rules = append(r.rules, rule)
-}
-
-// getCategoryFromCode determines the category from rule code
-func (r *RuleRegistry) getCategoryFromCode(code string) string {
-	categoryMap := map[string]string{
-		"LINE_":                  "line",
-		"ROUTE_":                 "route",
-		"SERVICE_JOURNEY_":       "service_journey",
-		"FLEXIBLE_LINE_":         "flexible_line",
-		"NETWORK_":               "network",
-		"AUTHORITY_":             "network",
-		"OPERATOR_":              "network",
-		"JOURNEY_PATTERN_":       "journey_pattern",
-		"STOP_POINT_":            "stop_point",
-		"SCHEDULED_STOP_":        "stop_point",
-		"VERSION_":               "version",
-		"TRANSPORT_MODE_":        "transport_mode",
-		"TRANSPORT_SUB_MODE_":    "transport_mode",
-		"BOOKING_":               "booking",
-		"FLEXIBLE_LINE_TYPE_":    "flexible_line",
-		"LINE_INVALID_COLOR":     "line",
-		"SERVICE_CALENDAR_":      "calendar",
-		"VALIDITY_CONDITIONS_":   "validity",
-		"DATED_SERVICE_JOURNEY_": "dated_service_journey",
-		"DEAD_RUN_":              "dead_run",
-		"INTERCHANGE_":           "interchange",
-		"NOTICE_":                "notice",
-		"COMPOSITE_FRAME_":       "frame",
-		"TIMETABLE_FRAME_":       "frame",
-		"SERVICE_FRAME_":         "frame",
-		"RESOURCE_FRAME_":        "frame",
-		"SITE_FRAME_":            "frame",
-		"INFRASTRUCTURE_FRAME_":  "frame",
-		"FLEXIBLE_SERVICE_":      "flexible_service",
-		"FLEXIBLE_STOP_":         "flexible_service",
-		"FLEXIBLE_AREA_":         "flexible_service",
-		"BLOCK_":                 "block",
-		"COURSE_OF_JOURNEYS_":    "course_of_journeys",
-		"TARIFF_ZONE_":           "tariff_zone",
-		"RESPONSIBILITY_SET_":    "responsibility_set",
-		"TYPE_OF_SERVICE_":       "type_of_service",
-		"GROUP_OF_":              "group",
-		"FARE_":                  "group",
-	}
-
-	for prefix, category := range categoryMap {
-		if len(code) >= len(prefix) && code[:len(prefix)] == prefix {
-			return category
-		}
-	}
-
-	return "custom"
 }

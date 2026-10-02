@@ -1,0 +1,124 @@
+{
+  "rules": {
+    "INVALID_BOOK_WHEN": {
+      "name": "Invalid BookWhen value",
+      "message": "BookWhen has invalid value",
+      "severity": "ERROR",
+      "xpath": "//lines/FlexibleLine[BookWhen and not(BookWhen = 'dayOfTravelOnly' or BookWhen = 'untilPreviousDay' or BookWhen = 'advanceAndDayOfTravel')]"
+    },
+    "MISSING_PROPERTIES": {
+      "name": "Mandatory booking property missing",
+      "message": "Flexible line is missing mandatory booking properties",
+      "severity": "ERROR",
+      "xpath": "//lines/FlexibleLine[FlexibleLineType and (FlexibleLineType = 'flexibleAreasOnly' or FlexibleLineType = 'hailAndRideAreas' or FlexibleLineType = 'demandAndResponseServices') and not(BookWhen or MinimumBookingPeriod)]"
+    },
+    "1": {
+      "name": "Missing booking arrangements",
+      "message": "Flexible service missing booking arrangements",
+      "severity": "ERROR",
+      "xpath": "//lines/FlexibleLine[not(BookingContact) and not(BookingUrl) and not(bookingArrangements)]"
+    },
+    "2": {
+      "name": "Invalid booking method",
+      "message": "Invalid booking method specified",
+      "severity": "ERROR",
+      "xpath": "//bookingArrangements/BookingMethod[not(text() = 'callDriver' or text() = 'callOffice' or text() = 'online' or text() = 'phoneAtStop' or text() = 'text')]"
+    },
+    "3": {
+      "name": "Invalid booking access",
+      "message": "Invalid booking access method",
+      "severity": "ERROR",
+      "xpath": "//bookingArrangements/BookingAccess[not(text() = 'public' or text() = 'authorisedPublic' or text() = 'staff' or text() = 'other')]"
+    },
+    "4": {
+      "name": "Invalid booking when",
+      "message": "Invalid booking time specification",
+      "severity": "ERROR",
+      "xpath": "//bookingArrangements/BookWhen[not(text() = 'timeOfTravelOnly' or text() = 'dayOfTravelOnly' or text() = 'untilPreviousDay' or text() = 'advanceOnly' or text() = 'other')]"
+    },
+    "5": {
+      "name": "Missing minimum booking period",
+      "message": "Minimum booking period required for advance booking",
+      "severity": "WARNING",
+      "xpath": "//bookingArrangements[BookWhen='advanceOnly' and not(MinimumBookingPeriod)]"
+    },
+    "INVALID_BOOK_WHEN_B": {
+      "name": "Invalid BookWhen property",
+      "message": "BookWhen has invalid value",
+      "severity": "ERROR",
+      "xpath": "//*/BookWhen[not(text() = 'timeOfTravelOnly' or text() = 'dayOfTravelOnly' or text() = 'untilPreviousDay' or text() = 'advanceAndDayOfTravel' or text() = 'other')]"
+    },
+    "INVALID_ACCESS": {
+      "name": "Invalid BookingAccess property",
+      "message": "BookingAccess has invalid value",
+      "severity": "ERROR",
+      "xpath": "//*/BookingAccess[not(text() = 'public' or text() = 'authorisedPublic' or text() = 'staff' or text() = 'other')]"
+    },
+    "INVALID_METHOD": {
+      "name": "Invalid BookingMethod property",
+      "message": "BookingMethod has invalid value",
+      "severity": "ERROR",
+      "xpath": "//*/BookingMethod[not(text() = 'callDriver' or text() = 'callOffice' or text() = 'online' or text() = 'phoneAtStop' or text() = 'text' or text() = 'none' or text() = 'other')]"
+    },
+    "INVALID_BUY_WHEN": {
+      "name": "Invalid BuyWhen property",
+      "message": "BuyWhen has invalid value",
+      "severity": "ERROR",
+      "xpath": "//*/BuyWhen[not(text() = 'timeOfTravelOnly' or text() = 'dayOfTravelOnly' or text() = 'untilPreviousDay' or text() = 'advanceAndDayOfTravel' or text() = 'other')]"
+    },
+    "MANDATORY_PROPERTIES_MISSING": {
+      "name": "Missing mandatory booking properties",
+      "message": "Flexible service missing required booking properties",
+      "severity": "ERROR",
+      "xpath": "//lines/FlexibleLine[FlexibleLineType = 'flexibleAreasOnly' or FlexibleLineType = 'hailAndRideAreas' or FlexibleLineType = 'demandAndResponseServices'][not(BookWhen) and not(MinimumBookingPeriod)]"
+    },
+    "CONFLICTING_PROPERTIES": {
+      "name": "Conflicting booking properties",
+      "message": "BookWhen and MinimumBookingPeriod should not both be specified",
+      "severity": "WARNING",
+      "xpath": "//lines/FlexibleLine[BookWhen and MinimumBookingPeriod]"
+    },
+    "LATEST_TIME_WITHOUT_WHEN": {
+      "name": "LatestBookingTime without BookWhen",
+      "message": "LatestBookingTime specified without BookWhen",
+      "severity": "WARNING",
+      "xpath": "//lines/FlexibleLine[LatestBookingTime and not(BookWhen)]"
+    },
+    "UNREASONABLE_MINIMUM_PERIOD": {
+      "name": "Unreasonable MinimumBookingPeriod",
+      "message": "MinimumBookingPeriod should be reasonable",
+      "severity": "WARNING",
+      "xpath": "//lines/FlexibleLine/MinimumBookingPeriod[. > 'P7D' or . < 'PT15M']"
+    },
+    "ARRANGEMENTS_NO_METHOD": {
+      "name": "BookingArrangements without method",
+      "message": "BookingArrangements should specify at least one booking method",
+      "severity": "WARNING",
+      "xpath": "//bookingArrangements[not(BookingMethod) and not(BookingContact) and not(BookingUrl)]"
+    },
+    "CONTACT_INCOMPLETE": {
+      "name": "Incomplete booking contact",
+      "message": "BookingContact should have phone, email, or URL",
+      "severity": "WARNING",
+      "xpath": "//bookingArrangements/BookingContact[not(Phone) and not(Email) and not(Url)]"
+    },
+    "INVALID_URL": {
+      "name": "Invalid booking URL",
+      "message": "BookingUrl should be valid URL format",
+      "severity": "WARNING",
+      "xpath": "//bookingArrangements/BookingUrl[not(starts-with(text(), 'http://') or starts-with(text(), 'https://'))]"
+    },
+    "NOTE_EMPTY": {
+      "name": "Empty booking note",
+      "message": "BookingNote should contain meaningful information",
+      "severity": "WARNING",
+      "xpath": "//bookingArrangements/BookingNote[not(text()) or normalize-space(text()) = '']"
+    },
+    "INCONSISTENT_METHODS": {
+      "name": "Inconsistent booking methods",
+      "message": "Multiple booking methods should be consistent",
+      "severity": "WARNING",
+      "xpath": "//bookingArrangements[count(BookingMethod) > 1 and BookingMethod = 'none']"
+    }
+  }
+}

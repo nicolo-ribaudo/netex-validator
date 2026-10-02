@@ -19,6 +19,7 @@ archives:
       - LICENSE
       - README.md
       - CHANGELOG.md
+      - rulesets/**/*
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_

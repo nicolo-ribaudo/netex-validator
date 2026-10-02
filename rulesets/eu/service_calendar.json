@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "1": {
+      "name": "ServiceCalendar missing DayTypes",
+      "message": "ServiceCalendar is missing DayTypes",
+      "severity": "ERROR",
+      "xpath": "//ServiceCalendar[not(dayTypes)]"
+    },
+    "2": {
+      "name": "ServiceCalendar missing OperatingPeriod",
+      "message": "ServiceCalendar is missing OperatingPeriod",
+      "severity": "ERROR",
+      "xpath": "//ServiceCalendar[not(operatingPeriods)]"
+    },
+    "MISSING_PERIODS": {
+      "name": "ServiceCalendar missing periods",
+      "message": "ServiceCalendar must have operating periods or day type assignments",
+      "severity": "ERROR",
+      "xpath": "//serviceCalendar/ServiceCalendar[not(operatingPeriods) and not(dayTypeAssignments)]"
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "rules": {
+    "2": {
+      "name": "Route missing Name",
+      "message": "Route is missing Name. Add <Name> to each Route for clarity in reporting and passenger information.",
+      "severity": "ERROR",
+      "xpath": "//*[local-name()='routes']/*[local-name()='Route'][not(*[local-name()='Name']) or normalize-space(*[local-name()='Name'])='']"
+    },
+    "3": {
+      "name": "Route missing LineRef",
+      "message": "Route is missing LineRef. Ensure a Route references its parent Line using <LineRef> (EU profile).",
+      "severity": "ERROR",
+      "xpath": "//*[local-name()='routes']/*[local-name()='Route'][not(*[local-name()='LineRef']) and not(*[local-name()='FlexibleLineRef'])]"
+    },
+    "4": {
+      "name": "Route missing pointsInSequence",
+      "message": "Route is missing pointsInSequence",
+      "severity": "ERROR",
+      "xpath": "//routes/Route[not(pointsInSequence)]"
+    },
+    "5": {
+      "name": "Route illegal DirectionRef",
+      "message": "Route has illegal DirectionRef",
+      "severity": "WARNING",
+      "xpath": "//routes/Route/DirectionRef"
+    },
+    "6": {
+      "name": "Route duplicated order",
+      "message": "Route has duplicated order values in PointOnRoute",
+      "severity": "WARNING",
+      "xpath": "//routes/Route/pointsInSequence/PointOnRoute[@order = preceding-sibling::PointOnRoute/@order]"
+    },
+    "7": {
+      "name": "Route missing DirectionType",
+      "message": "Route is missing DirectionType",
+      "severity": "WARNING",
+      "xpath": "//routes/Route[not(DirectionType)]"
+    },
+    "8": {
+      "name": "Route invalid DirectionType",
+      "message": "Route has invalid DirectionType",
+      "severity": "ERROR",
+      "xpath": "//routes/Route[DirectionType and not(DirectionType = 'inbound' or DirectionType = 'outbound' or DirectionType = 'clockwise' or DirectionType = 'anticlockwise')]"
+    },
+    "MISSING_NAME": {
+      "name": "Route missing Name",
+      "message": "Route should have descriptive Name",
+      "severity": "WARNING",
+      "xpath": "//routes/Route[not(Name) or normalize-space(Name) = '']"
+    },
+    "MISSING_DIRECTION": {
+      "name": "Route missing DirectionType",
+      "message": "Route should specify DirectionType",
+      "severity": "WARNING",
+      "xpath": "//routes/Route[not(DirectionType)]"
+    },
+    "POINT_ORDER_MISSING": {
+      "name": "RoutePoint missing order",
+      "message": "PointOnRoute must have order attribute",
+      "severity": "ERROR",
+      "xpath": "//routes/Route/pointsInSequence/PointOnRoute[not(@order)]"
+    },
+    "DUPLICATE_ORDER": {
+      "name": "Duplicate order in Route",
+      "message": "PointOnRoute order values must be unique within Route",
+      "severity": "ERROR",
+      "xpath": "//routes/Route/pointsInSequence/PointOnRoute[@order = preceding-sibling::PointOnRoute/@order or @order = following-sibling::PointOnRoute/@order]"
+    },
+    "INSUFFICIENT_POINTS": {
+      "name": "Route has insufficient points",
+      "message": "Route must have at least 2 points",
+      "severity": "ERROR",
+      "xpath": "//routes/Route[count(pointsInSequence/PointOnRoute) < 2]"
+    },
+    "DIRECTION_INCONSISTENCY": {
+      "name": "Route direction inconsistency",
+      "message": "Route DirectionType should be consistent with DestinationDisplay",
+      "severity": "WARNING",
+      "xpath": "//routes/Route[DirectionType = 'inbound' and DestinationDisplay[contains(translate(Name/text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'outbound')]]"
+    }
+  }
+}

@@ -78,6 +78,7 @@ func (vr *ValidationReport) MergeReport(other *ValidationReport)
     MergeReport merges another validation report into this one
 
 type ValidationReportEntry struct {
+	RuleID   string       `json:"ruleId,omitempty"`
 	Name     string       `json:"name"`
 	Message  string       `json:"message"`
 	Severity Severity     `json:"severity"`

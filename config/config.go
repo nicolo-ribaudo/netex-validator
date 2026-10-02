@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/theoremus-urban-solutions/netex-validator/types"
@@ -29,20 +30,22 @@ type ValidatorSettings struct {
 
 // RulesConfig contains rule-specific configuration
 type RulesConfig struct {
+	// Categories configures rule namespaces, keyed by namespace path (e.g. "line"
+	// or "eu/line", matching the rule IDs "line/2" or "eu/line/2").
 	Categories map[string]RuleCategoryConfig `yaml:"categories"`
 	Custom     []CustomRuleConfig            `yaml:"custom"`
 }
 
-// RuleCategoryConfig configures an entire category of rules
+// RuleCategoryConfig configures a rule namespace and everything nested in it
 type RuleCategoryConfig struct {
-	Enabled         bool                  `yaml:"enabled"`
+	Enabled         *bool                 `yaml:"enabled,omitempty"` // nil = enabled
 	DefaultSeverity *types.Severity       `yaml:"defaultSeverity,omitempty"`
-	Rules           map[string]RuleConfig `yaml:"rules,omitempty"`
+	Rules           map[string]RuleConfig `yaml:"rules,omitempty"` // keyed by rule key within the namespace
 }
 
 // RuleConfig configures a specific validation rule
 type RuleConfig struct {
-	Enabled  bool            `yaml:"enabled"`
+	Enabled  *bool           `yaml:"enabled,omitempty"` // nil = enabled
 	Severity *types.Severity `yaml:"severity,omitempty"`
 	Message  string          `yaml:"message,omitempty"`
 	XPath    string          `yaml:"xpath,omitempty"`
@@ -78,105 +81,8 @@ func DefaultConfig() *ValidatorConfig {
 			CacheTimeout:    30,
 		},
 		Rules: RulesConfig{
-			Categories: map[string]RuleCategoryConfig{
-				"line": {
-					Enabled:         true,
-					DefaultSeverity: nil, // Use rule default
-				},
-				"route": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"service_journey": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"flexible_line": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"network": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"journey_pattern": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"stop_point": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"version": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"transport_mode": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"booking": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"calendar": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"validity": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"dated_service_journey": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"dead_run": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"interchange": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"notice": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"frame": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"flexible_service": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"block": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"course_of_journeys": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"tariff_zone": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"responsibility_set": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"type_of_service": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-				"group": {
-					Enabled:         true,
-					DefaultSeverity: nil,
-				},
-			},
-			Custom: []CustomRuleConfig{},
+			Categories: map[string]RuleCategoryConfig{},
+			Custom:     []CustomRuleConfig{},
 		},
 		Output: OutputConfig{
 			Format:          "json",
@@ -285,65 +191,41 @@ func (c *ValidatorConfig) Validate() error {
 	return nil
 }
 
-// IsRuleEnabled checks if a specific rule is enabled
-func (c *ValidatorConfig) IsRuleEnabled(ruleCode string) bool {
-	// Determine category from rule code
-	category := getRuleCategoryFromCode(ruleCode)
-
-	// Check if category is enabled
-	if catConfig, exists := c.Rules.Categories[category]; exists {
-		if !catConfig.Enabled {
+// IsRuleEnabled checks if the rule with the given key in the given namespace
+// path is enabled. A rule is disabled if its namespace or any ancestor
+// namespace is disabled, or if it is disabled by a per-rule override.
+func (c *ValidatorConfig) IsRuleEnabled(namespace, key string) bool {
+	for _, ns := range namespaceAncestors(namespace) {
+		if catConfig, exists := c.Rules.Categories[ns]; exists && catConfig.Enabled != nil && !*catConfig.Enabled {
 			return false
 		}
-
-		// Check specific rule override
-		if ruleConfig, exists := catConfig.Rules[ruleCode]; exists {
-			return ruleConfig.Enabled
-		}
-
-		// Default to enabled if category is enabled
-		return true
 	}
 
-	// Check custom rules
-	for _, customRule := range c.Rules.Custom {
-		if customRule.Code == ruleCode {
-			return customRule.Enabled
+	if catConfig, exists := c.Rules.Categories[namespace]; exists {
+		if ruleConfig, exists := catConfig.Rules[key]; exists && ruleConfig.Enabled != nil {
+			return *ruleConfig.Enabled
 		}
 	}
 
-	// Default to enabled
 	return true
 }
 
-// GetRuleSeverity gets the effective severity for a rule
-func (c *ValidatorConfig) GetRuleSeverity(ruleCode string, defaultSeverity types.Severity) types.Severity {
-	// Determine category from rule code
-	category := getRuleCategoryFromCode(ruleCode)
-
-	// Check category configuration
-	if catConfig, exists := c.Rules.Categories[category]; exists {
-		// Check specific rule override
-		if ruleConfig, exists := catConfig.Rules[ruleCode]; exists {
-			if ruleConfig.Severity != nil {
-				return *ruleConfig.Severity
-			}
+// GetRuleSeverity gets the effective severity for the rule with the given key
+// in the given namespace path: a per-rule override, else the defaultSeverity
+// of the nearest namespace that sets one, else defaultSeverity.
+func (c *ValidatorConfig) GetRuleSeverity(namespace, key string, defaultSeverity types.Severity) types.Severity {
+	if catConfig, exists := c.Rules.Categories[namespace]; exists {
+		if ruleConfig, exists := catConfig.Rules[key]; exists && ruleConfig.Severity != nil {
+			return *ruleConfig.Severity
 		}
+	}
 
-		// Check category default
-		if catConfig.DefaultSeverity != nil {
+	for _, ns := range namespaceAncestors(namespace) {
+		if catConfig, exists := c.Rules.Categories[ns]; exists && catConfig.DefaultSeverity != nil {
 			return *catConfig.DefaultSeverity
 		}
 	}
 
-	// Check custom rules
-	for _, customRule := range c.Rules.Custom {
-		if customRule.Code == ruleCode {
-			return customRule.Severity
-		}
-	}
-
-	// Return original default
 	return defaultSeverity
 }
 
@@ -358,65 +240,56 @@ func (c *ValidatorConfig) GetCustomRules() []CustomRuleConfig {
 	return enabled
 }
 
-// getRuleCategoryFromCode determines the rule category from rule code
-func getRuleCategoryFromCode(ruleCode string) string {
-	if len(ruleCode) == 0 {
-		return "unknown"
-	}
-
-	// Map rule codes to categories
-	categoryMap := map[string]string{
-		"LINE_":                  "line",
-		"ROUTE_":                 "route",
-		"SERVICE_JOURNEY_":       "service_journey",
-		"FLEXIBLE_LINE_":         "flexible_line",
-		"NETWORK_":               "network",
-		"AUTHORITY_":             "network",
-		"OPERATOR_":              "network",
-		"JOURNEY_PATTERN_":       "journey_pattern",
-		"STOP_POINT_":            "stop_point",
-		"SCHEDULED_STOP_":        "stop_point",
-		"VERSION_":               "version",
-		"TRANSPORT_MODE_":        "transport_mode",
-		"TRANSPORT_SUB_MODE_":    "transport_mode",
-		"BOOKING_":               "booking",
-		"FLEXIBLE_LINE_TYPE_":    "flexible_line",
-		"LINE_INVALID_COLOR":     "line",
-		"SERVICE_CALENDAR_":      "calendar",
-		"VALIDITY_CONDITIONS_":   "validity",
-		"DATED_SERVICE_JOURNEY_": "dated_service_journey",
-		"DEAD_RUN_":              "dead_run",
-		"INTERCHANGE_":           "interchange",
-		"NOTICE_":                "notice",
-		"COMPOSITE_FRAME_":       "frame",
-		"TIMETABLE_FRAME_":       "frame",
-		"SERVICE_FRAME_":         "frame",
-		"RESOURCE_FRAME_":        "frame",
-		"SITE_FRAME_":            "frame",
-		"INFRASTRUCTURE_FRAME_":  "frame",
-		"FLEXIBLE_SERVICE_":      "flexible_service",
-		"FLEXIBLE_STOP_":         "flexible_service",
-		"FLEXIBLE_AREA_":         "flexible_service",
-		"BLOCK_":                 "block",
-		"COURSE_OF_JOURNEYS_":    "course_of_journeys",
-		"TARIFF_ZONE_":           "tariff_zone",
-		"RESPONSIBILITY_SET_":    "responsibility_set",
-		"TYPE_OF_SERVICE_":       "type_of_service",
-		"GROUP_OF_":              "group",
-		"FARE_":                  "group",
-	}
-
-	for prefix, category := range categoryMap {
-		if len(ruleCode) >= len(prefix) && ruleCode[:len(prefix)] == prefix {
-			return category
+// namespaceAncestors returns the namespace path and its ancestors, nearest
+// first: "eu/line" -> ["eu/line", "eu"].
+func namespaceAncestors(namespace string) []string {
+	var result []string
+	for namespace != "" {
+		result = append(result, namespace)
+		i := strings.LastIndex(namespace, "/")
+		if i < 0 {
+			break
 		}
+		namespace = namespace[:i]
 	}
-
-	return "custom"
+	return result
 }
 
 // GenerateDefaultConfigFile creates a default configuration file
 func GenerateDefaultConfigFile(configPath string) error {
 	config := DefaultConfig()
 	return config.SaveConfig(configPath)
+}
+
+// UnmatchedRuleConfig describes the entries of rules.categories that match no
+// loaded rule, so that stale or mistyped configuration can be reported instead
+// of being silently ignored. ruleIDs maps each loaded rule's namespace path to
+// its keys.
+func (c *ValidatorConfig) UnmatchedRuleConfig(ruleIDs map[string][]string) []string {
+	namespaces := make(map[string]bool)
+	ids := make(map[string]bool)
+	for ns, keys := range ruleIDs {
+		namespaces[ns] = true
+		for _, ancestor := range namespaceAncestors(ns) {
+			namespaces[ancestor] = true
+		}
+		for _, key := range keys {
+			ids[ns+"/"+key] = true
+		}
+	}
+
+	var problems []string
+	for ns, catConfig := range c.Rules.Categories {
+		if !namespaces[ns] {
+			problems = append(problems, fmt.Sprintf("rules.categories.%q matches no loaded rule namespace", ns))
+			continue
+		}
+		for key := range catConfig.Rules {
+			if !ids[ns+"/"+key] {
+				problems = append(problems, fmt.Sprintf("rules.categories.%q.rules.%q matches no loaded rule", ns, key))
+			}
+		}
+	}
+	sort.Strings(problems)
+	return problems
 }

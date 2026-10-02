@@ -1,26 +1,48 @@
 package rules // import "github.com/theoremus-urban-solutions/netex-validator/rules"
 
 
+FUNCTIONS
+
+func DefaultRuleSetName(path string) string
+    DefaultRuleSetName returns the namespace used for a rule file when none is
+    given: its base name without extension.
+
+func ValidateRuleSetName(name string) error
+    ValidateRuleSetName returns an error if name cannot be used as a namespace.
+
+
 TYPES
 
 type Rule struct {
-	Code        string
-	Name        string
-	Message     string
-	Severity    types.Severity
-	XPath       string
+	// Code is the full rule ID: the namespace path and Key joined with "/".
+	Code     string
+	Key      string
+	Name     string
+	Message  string
+	Severity types.Severity
+	XPath    string
+	// Category is the namespace path the rule was loaded under (may be empty).
 	Category    string
 	Description string
 }
     Rule represents a single validation rule
+
+func LoadRuleSets(sets []RuleSet) ([]Rule, error)
+    LoadRuleSets loads the given JSON rule files, in order.
+
+    Each rule's Code is its namespace path and key joined with "/", e.g.
+    "line/2", or "eu/line/2" when line.json is reached through an "extends"
+    entry named "line" in a file loaded under the namespace "eu". A single rule
+    set with an empty Name is loaded without a top-level namespace.
 
 type RuleRegistry struct {
 	// Has unexported fields.
 }
     RuleRegistry manages all validation rules
 
-func NewRuleRegistry(cfg *config.ValidatorConfig) *RuleRegistry
-    NewRuleRegistry creates a new rule registry with all built-in rules
+func NewRuleRegistry(cfg *config.ValidatorConfig, rules []Rule) *RuleRegistry
+    NewRuleRegistry creates a new rule registry holding the given rules,
+    typically loaded with LoadRuleSets.
 
 func (r *RuleRegistry) GetAllCategories() []string
     GetAllCategories returns all available rule categories
@@ -34,6 +56,13 @@ func (r *RuleRegistry) GetRuleByCode(code string) (Rule, bool)
 func (r *RuleRegistry) GetRulesByCategory(category string) []Rule
     GetRulesByCategory returns all rules in a specific category
 
-func (r *RuleRegistry) WithProfile(profile string) *RuleRegistry
-    WithProfile allows selecting a ruleset profile (e.g., "eu", "custom").
+type RuleSet struct {
+	// Name is the namespace for the rules in the file. When empty, it defaults
+	// to the file base name (see DefaultRuleSetName), unless the rule set is
+	// the only one being loaded, in which case its rules are not namespaced.
+	Name string
+	// Path is the path to the JSON rule file.
+	Path string
+}
+    RuleSet is a JSON rule file loaded under a namespace.
 

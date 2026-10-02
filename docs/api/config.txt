@@ -28,14 +28,14 @@ type OutputConfig struct {
     OutputConfig configures output settings
 
 type RuleCategoryConfig struct {
-	Enabled         bool                  `yaml:"enabled"`
+	Enabled         *bool                 `yaml:"enabled,omitempty"` // nil = enabled
 	DefaultSeverity *types.Severity       `yaml:"defaultSeverity,omitempty"`
-	Rules           map[string]RuleConfig `yaml:"rules,omitempty"`
+	Rules           map[string]RuleConfig `yaml:"rules,omitempty"` // keyed by rule key within the namespace
 }
-    RuleCategoryConfig configures an entire category of rules
+    RuleCategoryConfig configures a rule namespace and everything nested in it
 
 type RuleConfig struct {
-	Enabled  bool            `yaml:"enabled"`
+	Enabled  *bool           `yaml:"enabled,omitempty"` // nil = enabled
 	Severity *types.Severity `yaml:"severity,omitempty"`
 	Message  string          `yaml:"message,omitempty"`
 	XPath    string          `yaml:"xpath,omitempty"`
@@ -43,6 +43,8 @@ type RuleConfig struct {
     RuleConfig configures a specific validation rule
 
 type RulesConfig struct {
+	// Categories configures rule namespaces, keyed by namespace path (e.g. "line"
+	// or "eu/line", matching the rule IDs "line/2" or "eu/line/2").
 	Categories map[string]RuleCategoryConfig `yaml:"categories"`
 	Custom     []CustomRuleConfig            `yaml:"custom"`
 }
@@ -64,14 +66,24 @@ func LoadConfig(configPath string) (*ValidatorConfig, error)
 func (c *ValidatorConfig) GetCustomRules() []CustomRuleConfig
     GetCustomRules returns all enabled custom rules
 
-func (c *ValidatorConfig) GetRuleSeverity(ruleCode string, defaultSeverity types.Severity) types.Severity
-    GetRuleSeverity gets the effective severity for a rule
+func (c *ValidatorConfig) GetRuleSeverity(namespace, key string, defaultSeverity types.Severity) types.Severity
+    GetRuleSeverity gets the effective severity for the rule with the given key
+    in the given namespace path: a per-rule override, else the defaultSeverity
+    of the nearest namespace that sets one, else defaultSeverity.
 
-func (c *ValidatorConfig) IsRuleEnabled(ruleCode string) bool
-    IsRuleEnabled checks if a specific rule is enabled
+func (c *ValidatorConfig) IsRuleEnabled(namespace, key string) bool
+    IsRuleEnabled checks if the rule with the given key in the given namespace
+    path is enabled. A rule is disabled if its namespace or any ancestor
+    namespace is disabled, or if it is disabled by a per-rule override.
 
 func (c *ValidatorConfig) SaveConfig(configPath string) error
     SaveConfig saves configuration to a YAML file
+
+func (c *ValidatorConfig) UnmatchedRuleConfig(ruleIDs map[string][]string) []string
+    UnmatchedRuleConfig describes the entries of rules.categories that match no
+    loaded rule, so that stale or mistyped configuration can be reported instead
+    of being silently ignored. ruleIDs maps each loaded rule's namespace path to
+    its keys.
 
 func (c *ValidatorConfig) Validate() error
     Validate validates the configuration

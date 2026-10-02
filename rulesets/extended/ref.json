@@ -1,0 +1,34 @@
+{
+  "rules": {
+    "OPERATOR_1": {
+      "name": "OperatorRef undefined",
+      "message": "OperatorRef does not reference an existing Operator in ResourceFrame",
+      "severity": "ERROR",
+      "xpath": "//*[local-name()='ServiceFrame']//*[local-name()='OperatorRef' and (@ref or normalize-space(text())!='')][not(@ref=//ResourceFrame//*[local-name()='Operator']/@id) and not(normalize-space(text())=//ResourceFrame//*[local-name()='Operator']/@id)]"
+    },
+    "LINE_1": {
+      "name": "LineRef undefined",
+      "message": "LineRef does not reference an existing Line in ServiceFrame",
+      "severity": "ERROR",
+      "xpath": "//*[local-name()='ServiceFrame']//*[local-name()='LineRef' and (@ref or normalize-space(text())!='')][not(@ref=//ServiceFrame//*[local-name()='lines']/*[local-name()='Line' or local-name()='FlexibleLine']/@id) and not(normalize-space(text())=//ServiceFrame//*[local-name()='lines']/*[local-name()='Line' or local-name()='FlexibleLine']/@id)]"
+    },
+    "JOURNEY_PATTERN_1": {
+      "name": "JourneyPatternRef undefined",
+      "message": "JourneyPatternRef does not reference an existing JourneyPattern in ServiceFrame",
+      "severity": "ERROR",
+      "xpath": "//*[local-name()='ServiceFrame']//*[local-name()='JourneyPatternRef' and (@ref or normalize-space(text())!='')][not(@ref=//ServiceFrame//*[local-name()='journeyPatterns']/*[local-name()='JourneyPattern' or local-name()='ServiceJourneyPattern']/@id) and not(normalize-space(text())=//ServiceFrame//*[local-name()='journeyPatterns']/*[local-name()='JourneyPattern' or local-name()='ServiceJourneyPattern']/@id)]"
+    },
+    "SERVICE_JOURNEY_1": {
+      "name": "ServiceJourneyRef undefined",
+      "message": "ServiceJourneyRef in TimetableFrame does not reference an existing ServiceJourney in ServiceFrame",
+      "severity": "ERROR",
+      "xpath": "//*[local-name()='TimetableFrame']//*[local-name()='DatedServiceJourney']/*[local-name()='ServiceJourneyRef' and (@ref or normalize-space(text())!='')][not(@ref=//ServiceFrame//*[local-name()='vehicleJourneys']/*[local-name()='ServiceJourney']/@id) and not(normalize-space(text())=//ServiceFrame//*[local-name()='vehicleJourneys']/*[local-name()='ServiceJourney']/@id)]"
+    },
+    "STOP_POINT_1": {
+      "name": "ScheduledStopPointRef undefined",
+      "message": "ScheduledStopPointRef does not reference an existing ScheduledStopPoint in ServiceFrame",
+      "severity": "ERROR",
+      "xpath": "//*[local-name()='ServiceFrame']//*[local-name()='ScheduledStopPointRef' and (@ref or normalize-space(text())!='')][not(@ref=//ServiceFrame//*[local-name()='scheduledStopPoints']/*[local-name()='ScheduledStopPoint']/@id) and not(normalize-space(text())=//ServiceFrame//*[local-name()='scheduledStopPoints']/*[local-name()='ScheduledStopPoint']/@id)]"
+    }
+  }
+}

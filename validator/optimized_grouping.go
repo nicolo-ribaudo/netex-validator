@@ -62,7 +62,10 @@ type OptimizedNotices struct {
 // For ID-related issues, groups by problematic NetEX ID with context.
 // For other issues, groups by file with detailed occurrence information.
 type OptimizedNoticeGroup struct {
-	Type        string         `json:"type"`
+	Type string `json:"type"`
+	// RuleIDs lists the IDs of the rules reported under this type (several
+	// rules can share a name, e.g. when loaded from different rule sets).
+	RuleIDs     []string       `json:"ruleIds,omitempty"`
 	Description string         `json:"description,omitempty"`
 	Count       int            `json:"count"`
 	Severity    types.Severity `json:"severity"`
@@ -191,8 +194,21 @@ func (r *ValidationResult) createOptimizedGroup(ruleName string, entries []Valid
 	}
 	sort.Strings(affectedFiles)
 
+	ruleIDSet := make(map[string]bool)
+	for _, entry := range entries {
+		if entry.RuleID != "" {
+			ruleIDSet[entry.RuleID] = true
+		}
+	}
+	ruleIDs := make([]string, 0, len(ruleIDSet))
+	for id := range ruleIDSet {
+		ruleIDs = append(ruleIDs, id)
+	}
+	sort.Strings(ruleIDs)
+
 	group := OptimizedNoticeGroup{
 		Type:           ruleName,
+		RuleIDs:        ruleIDs,
 		Description:    getDescriptionForRule(ruleName),
 		Count:          len(entries),
 		Severity:       firstEntry.Severity,

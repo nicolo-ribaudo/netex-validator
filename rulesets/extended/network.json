@@ -1,0 +1,70 @@
+{
+  "rules": {
+    "1": {
+      "name": "Network missing AuthorityRef",
+      "message": "Network is missing AuthorityRef",
+      "severity": "ERROR",
+      "xpath": "//Network[not(AuthorityRef)]"
+    },
+    "2": {
+      "name": "Network missing Name on Network",
+      "message": "Network is missing Name",
+      "severity": "ERROR",
+      "xpath": "//Network[not(Name) or normalize-space(Name) = '']"
+    },
+    "3": {
+      "name": "Network missing Name on GroupOfLines",
+      "message": "GroupOfLines is missing Name",
+      "severity": "ERROR",
+      "xpath": "//Network/groupsOfLines/GroupOfLines[not(Name) or normalize-space(Name) = '']"
+    },
+    "AUTHORITY_2": {
+      "name": "Authority missing Name",
+      "message": "Authority is missing Name",
+      "severity": "ERROR",
+      "xpath": "//organisations/Authority[not(Name) or normalize-space(Name) = '']"
+    },
+    "OPERATOR_2": {
+      "name": "Operator missing Name",
+      "message": "Operator is missing Name",
+      "severity": "ERROR",
+      "xpath": "//organisations/Operator[not(Name) or normalize-space(Name) = '']"
+    },
+    "1_B": {
+      "name": "Network missing Name",
+      "message": "Network must have a Name",
+      "severity": "ERROR",
+      "xpath": "//networks/Network[not(Name) or normalize-space(Name) = '']"
+    },
+    "2_B": {
+      "name": "Network missing AuthorityRef",
+      "message": "Network should reference an Authority",
+      "severity": "WARNING",
+      "xpath": "//networks/Network[not(AuthorityRef)]"
+    },
+    "OPERATOR_1": {
+      "name": "Operator missing Name",
+      "message": "Operator must have a Name",
+      "severity": "ERROR",
+      "xpath": "//operators/Operator[not(Name) or normalize-space(Name) = '']"
+    },
+    "OPERATOR_2_B": {
+      "name": "Operator missing ContactDetails",
+      "message": "Operator should have contact details",
+      "severity": "WARNING",
+      "xpath": "//operators/Operator[not(ContactDetails)]"
+    },
+    "AUTHORITY_1": {
+      "name": "Authority missing Name",
+      "message": "Authority must have a Name",
+      "severity": "ERROR",
+      "xpath": "//organisations/Authority[not(Name) or normalize-space(Name) = '']"
+    },
+    "AUTHORITY_MISSING_NAME": {
+      "name": "Authority missing Name",
+      "message": "Authority must have Name",
+      "severity": "ERROR",
+      "xpath": "//organisations/Authority[not(Name) or normalize-space(Name) = '']"
+    }
+  }
+}

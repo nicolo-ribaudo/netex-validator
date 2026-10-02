@@ -1,0 +1,34 @@
+{
+  "rules": {
+    "ACCESSIBILITY_INFO_REQUIRED": {
+      "name": "EU accessibility information required",
+      "message": "EU profile encourages accessibility information",
+      "severity": "INFO",
+      "xpath": "//stopPlaces/StopPlace[not(AccessibilityAssessment) and not(placeEquipments)]"
+    },
+    "MULTILINGUAL_NAMES": {
+      "name": "EU multilingual name support",
+      "message": "EU profile supports multilingual names",
+      "severity": "INFO",
+      "xpath": "//Name[not(@lang) and ancestor::PublicationDelivery[@locale != @lang]]"
+    },
+    "INTERCHANGE_TIME_REQUIRED": {
+      "name": "EU interchange time requirements",
+      "message": "EU profile requires realistic interchange times",
+      "severity": "WARNING",
+      "xpath": "//interchanges/ServiceJourneyInterchange[not(StandardTransferTime) and not(MinimumTransferTime)]"
+    },
+    "FARE_INFO_ENCOURAGED": {
+      "name": "EU fare information encouraged",
+      "message": "EU profile encourages fare information",
+      "severity": "INFO",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][not(//fareProducts) and not(//tariffZones)]"
+    },
+    "ENVIRONMENTAL_INFO": {
+      "name": "EU environmental information",
+      "message": "EU profile supports environmental impact information",
+      "severity": "INFO",
+      "xpath": "//vehicleTypes/VehicleType[not(FuelType) and not(EmissionClassification)]"
+    }
+  }
+}

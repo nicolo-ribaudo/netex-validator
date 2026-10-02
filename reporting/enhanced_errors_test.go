@@ -10,7 +10,7 @@ import (
 const (
 	// Test constants for repeated strings
 	testOperatorRef = "OperatorRef"
-	testLine2       = "LINE_2"
+	testLine2       = "line/2"
 )
 
 func TestValidationError_Error(t *testing.T) {
@@ -286,17 +286,17 @@ func TestNewInvalidReferenceError(t *testing.T) {
 }
 
 func TestNewBusinessRuleViolationError(t *testing.T) {
-	err := NewBusinessRuleViolationError("business.xml", "LINE_2", "Line missing Name", "Line element is missing required Name", 30)
+	err := NewBusinessRuleViolationError("business.xml", testLine2, "Line missing Name", "Line element is missing required Name", 30)
 
 	if err.Rule != testLine2 {
-		t.Errorf("Expected rule 'LINE_2', got: %s", err.Rule)
+		t.Errorf("Expected rule 'line/2', got: %s", err.Rule)
 	}
 
 	if err.Context["rule_code"] != testLine2 {
-		t.Errorf("Expected context rule_code = 'LINE_2', got: %v", err.Context["rule_code"])
+		t.Errorf("Expected context rule_code = 'line/2', got: %v", err.Context["rule_code"])
 	}
 
-	// Check for LINE_2-specific suggestions
+	// Check for line/2-specific suggestions
 	foundLineSuggestion := false
 	for _, suggestion := range err.Suggestions {
 		if strings.Contains(suggestion, "descriptive <Name> element") {
@@ -305,7 +305,7 @@ func TestNewBusinessRuleViolationError(t *testing.T) {
 		}
 	}
 	if !foundLineSuggestion {
-		t.Error("Expected LINE_2-specific suggestion about adding Name element")
+		t.Error("Expected line/2-specific suggestion about adding Name element")
 	}
 }
 
@@ -413,7 +413,7 @@ func TestErrorFormatter_FormatAsList_Empty(t *testing.T) {
 
 func TestGetBusinessRuleSuggestions(t *testing.T) {
 	// Test specific rule suggestions
-	suggestions := getBusinessRuleSuggestions("LINE_2", "Line missing Name")
+	suggestions := getBusinessRuleSuggestions("eu/line/2", "Line missing Name")
 
 	foundNameSuggestion := false
 	for _, suggestion := range suggestions {
@@ -423,7 +423,7 @@ func TestGetBusinessRuleSuggestions(t *testing.T) {
 		}
 	}
 	if !foundNameSuggestion {
-		t.Error("Expected LINE_2-specific suggestion about Name element")
+		t.Error("Expected line/2-specific suggestion about Name element")
 	}
 
 	// Test unknown rule

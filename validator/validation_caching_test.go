@@ -12,7 +12,7 @@ import (
 
 func TestValidationCaching_Basic(t *testing.T) {
 	t.Run("Cache hit and miss", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithValidationCache(true, 100, 10, 1)
@@ -74,7 +74,7 @@ func TestValidationCaching_Basic(t *testing.T) {
 	})
 
 	t.Run("Different content produces different cache entries", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithValidationCache(true, 100, 10, 1)
@@ -113,7 +113,7 @@ func TestValidationCaching_Basic(t *testing.T) {
 	})
 
 	t.Run("Cache disabled validation", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithValidationCache(false, 0, 0, 0) // Cache disabled
@@ -147,7 +147,7 @@ func TestValidationCaching_Basic(t *testing.T) {
 
 func TestValidationCaching_MemoryLimits(t *testing.T) {
 	t.Run("Cache memory limit enforcement", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithValidationCache(true, 1000, 1, 1) // Very small memory limit
@@ -177,7 +177,7 @@ func TestValidationCaching_MemoryLimits(t *testing.T) {
 	})
 
 	t.Run("Cache entry limit enforcement", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithValidationCache(true, 3, 10, 1) // Very small entry limit
@@ -225,7 +225,7 @@ func TestValidationCaching_TTL(t *testing.T) {
 			t.Skip("Skipping TTL test in short mode")
 		}
 
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithValidationCache(true, 100, 10, 1) // Short TTL for testing
@@ -278,7 +278,7 @@ func TestValidationCaching_FileValidation(t *testing.T) {
 	tm := testutil.NewTestDataManager(t)
 
 	t.Run("File validation with caching", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithValidationCache(true, 100, 10, 1)
@@ -311,7 +311,7 @@ func TestValidationCaching_FileValidation(t *testing.T) {
 
 func TestValidationCaching_ConcurrentAccess(t *testing.T) {
 	t.Run("Concurrent cache access", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithValidationCache(true, 50, 5, 1)
@@ -372,7 +372,7 @@ func TestValidationCaching_ConcurrentAccess(t *testing.T) {
 
 func TestValidationCaching_HashCollisions(t *testing.T) {
 	t.Run("Hash collision handling", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace(testutil.TestCodespace).
 			WithSkipSchema(true).
 			WithValidationCache(true, 100, 10, 1)
@@ -445,7 +445,7 @@ func createLargeNetEXContent(baseContent string, multiplier int) string {
 }
 
 func BenchmarkValidationCaching_CacheHit(b *testing.B) {
-	options := DefaultValidationOptions().
+	options := testOptions(b).
 		WithCodespace(testutil.TestCodespace).
 		WithSkipSchema(true).
 		WithValidationCache(true, 100, 10, 1)
@@ -467,7 +467,7 @@ func BenchmarkValidationCaching_CacheHit(b *testing.B) {
 }
 
 func BenchmarkValidationCaching_CacheMiss(b *testing.B) {
-	options := DefaultValidationOptions().
+	options := testOptions(b).
 		WithCodespace(testutil.TestCodespace).
 		WithSkipSchema(true).
 		WithValidationCache(true, 100, 10, 1)

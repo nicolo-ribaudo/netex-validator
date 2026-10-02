@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "1": {
+      "name": "DeadRun missing RouteRef",
+      "message": "DeadRun is missing RouteRef",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/DeadRun[not(RouteRef)]"
+    },
+    "2": {
+      "name": "DeadRun missing passingTimes",
+      "message": "DeadRun is missing passingTimes",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/DeadRun[not(passingTimes)]"
+    }
+  }
+}

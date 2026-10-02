@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "1": {
+      "name": "Notice missing Name",
+      "message": "Notice is missing Name",
+      "severity": "WARNING",
+      "xpath": "//notices/Notice[not(Name) or normalize-space(Name) = '']"
+    },
+    "2": {
+      "name": "Notice missing Text",
+      "message": "Notice is missing Text",
+      "severity": "ERROR",
+      "xpath": "//notices/Notice[not(Text) or normalize-space(Text) = '']"
+    },
+    "3": {
+      "name": "NoticeAssignment missing NoticedObjectRef",
+      "message": "NoticeAssignment is missing NoticedObjectRef",
+      "severity": "ERROR",
+      "xpath": "//noticeAssignments/NoticeAssignment[not(NoticedObjectRef)]"
+    }
+  }
+}

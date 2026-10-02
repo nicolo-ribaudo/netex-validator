@@ -4,15 +4,17 @@ Package netexvalidator provides a comprehensive NetEX validation library for Go
 applications.
 
 This package validates NetEX (Network Exchange) files against the EU NeTEx
-Profile, supporting over 200 validation rules covering schema validation,
-business logic rules, and cross-file ID validation.
+Profile, covering schema validation, XPath business rules loaded from JSON rule
+files, and cross-file ID validation.
 
 Basic usage:
 
     import "github.com/theoremus-urban-solutions/netex-validator"
 
     // Simple validation
-    options := netexvalidator.DefaultValidationOptions().WithCodespace("MyCodespace")
+    options := netexvalidator.DefaultValidationOptions().
+    	WithCodespace("MyCodespace").
+    	WithRuleSet("", "rulesets/eu.json")
     result, err := netexvalidator.ValidateFile("data.xml", options)
     if err != nil {
     	log.Fatal(err)
@@ -35,7 +37,8 @@ The library supports multiple validation modes:
   - Single XML file validation
   - ZIP dataset validation (multiple files)
   - In-memory content validation
-  - Configurable rule sets via YAML
+  - Business rules from JSON rule files (see ValidationOptions.RuleSets)
+  - Rule customization via YAML
 
 Output formats include JSON, HTML (with interactive interface), and plain text.
 
@@ -150,7 +153,7 @@ func New() (*NetexValidator, error)
     New creates a new NetexValidator instance with default configuration.
 
     The default configuration includes:
-      - All validation rules enabled
+      - No XPath business rules (use NewWithOptions with RuleSets to add some)
       - Schema validation enabled
       - Maximum 100 schema errors reported
       - Verbose mode disabled
@@ -171,7 +174,7 @@ func NewWithOptions(opts *ValidationOptions) (*NetexValidator, error)
     This allows you to customize validation behavior such as:
       - Skipping schema validation for faster processing
       - Setting custom codespace for validation context
-      - Configuring rule overrides via YAML files
+      - Selecting JSON rule sets and configuring rule overrides via YAML files
       - Enabling verbose output for debugging
 
     Parameters:
@@ -184,7 +187,7 @@ func NewWithOptions(opts *ValidationOptions) (*NetexValidator, error)
 
         options := netexvalidator.DefaultValidationOptions().
         	WithCodespace("MyCodespace").
-        	WithVerbose(true).
+        	WithRuleSet("", "rulesets/eu.json").
         	WithSkipSchema(true)
         validator, err := netexvalidator.NewWithOptions(options)
 
@@ -229,7 +232,10 @@ type OptimizedGroupedResult struct {
     duplicates.
 
 type OptimizedNoticeGroup struct {
-	Type        string         `json:"type"`
+	Type string `json:"type"`
+	// RuleIDs lists the IDs of the rules reported under this type (several
+	// rules can share a name, e.g. when loaded from different rule sets).
+	RuleIDs     []string       `json:"ruleIds,omitempty"`
 	Description string         `json:"description,omitempty"`
 	Count       int            `json:"count"`
 	Severity    types.Severity `json:"severity"`
@@ -280,6 +286,9 @@ type OptimizedSummary struct {
 }
     OptimizedSummary provides enhanced summary with grouping insights
 
+type RuleSet = rules.RuleSet
+    RuleSet is a JSON rule file loaded under a namespace. See rules.RuleSet.
+
 type SimpleXPathRule struct {
 	// Has unexported fields.
 }
@@ -305,8 +314,8 @@ type ValidationOptions struct {
 	Codespace string
 
 	// ConfigFile specifies the path to a YAML configuration file for rule customization.
-	// If empty, built-in default rules are used. The config file can enable/disable
-	// specific rules and override their severity levels.
+	// The config file can enable/disable rule namespaces or specific rules and
+	// override their severity levels.
 	ConfigFile string
 
 	// SkipSchema bypasses XML schema validation for faster processing.
@@ -319,6 +328,13 @@ type ValidationOptions struct {
 	// XML structure checking without business logic validation.
 	SkipValidators bool
 
+	// RuleSets lists the JSON rule files to run as XPath business rules, in order.
+	// No rules are compiled into the validator: if RuleSets is empty, no XPath
+	// business rules are run. A single rule set with an empty Name is loaded
+	// without a namespace (rule IDs like "line/2"); otherwise each rule set is
+	// namespaced by its Name, defaulting to the file base name ("eu/line/2").
+	RuleSets []RuleSet
+
 	// MaxSchemaErrors limits the number of schema validation errors reported.
 	// Set to 0 to use the configuration default (typically 100).
 	// Higher values provide more comprehensive error reporting but may impact performance.
@@ -330,12 +346,12 @@ type ValidationOptions struct {
 	Verbose bool
 
 	// RuleOverrides allows selective enabling/disabling of validation rules.
-	// Map key is the rule code (e.g., "LINE_2", "SERVICE_JOURNEY_4"),
+	// Map key is the full rule ID (e.g., "line/2", "eu/line/2"),
 	// value indicates whether the rule should be executed.
 	RuleOverrides map[string]bool
 
 	// SeverityOverrides allows changing the severity level of specific rules.
-	// Map key is the rule code, value is the new severity level to apply.
+	// Map key is the full rule ID, value is the new severity level to apply.
 	// Useful for treating warnings as errors or vice versa based on local requirements.
 	SeverityOverrides map[string]types.Severity
 
@@ -356,7 +372,7 @@ type ValidationOptions struct {
 	// based on LogLevel and LogFormat settings.
 	Logger *logging.Logger
 
-	// Profile is deprecated; EU is the default and only supported profile.
+	// Profile is deprecated and ignored; select rules with RuleSets.
 	Profile string
 
 	// MaxFindings limits the total number of validation findings to collect (0 = unlimited).
@@ -454,8 +470,8 @@ func (o *ValidationOptions) WithConfigFile(configFile string) *ValidationOptions
     options for chaining.
 
     The configuration file allows customizing validation rules, their severity
-    levels, and other validation parameters. If not specified, built-in defaults
-    are used.
+    levels, and other validation parameters. If not specified, rules run as
+    defined in their files.
 
     Example:
 
@@ -515,14 +531,26 @@ func (o *ValidationOptions) WithRuleOverride(ruleCode string, enabled bool) *Val
     validation results.
 
     Parameters:
-      - ruleCode: The rule identifier (e.g., "LINE_2", "SERVICE_JOURNEY_4")
+      - ruleCode: The full rule ID (e.g., "line/2", "eu/service_journey/4")
       - enabled: Whether the rule should be executed
 
     Example:
 
         options := DefaultValidationOptions().
-        	WithRuleOverride("LINE_2", false).     // Disable this rule
-        	WithRuleOverride("ROUTE_3", true)      // Explicitly enable this rule
+        	WithRuleOverride("line/2", false).     // Disable this rule
+        	WithRuleOverride("route/3", true)      // Explicitly enable this rule
+
+func (o *ValidationOptions) WithRuleSet(name, path string) *ValidationOptions
+    WithRuleSet adds a JSON rule file to run and returns the options for
+    chaining.
+
+    The name is the namespace for the rules in the file; pass "" to use the file
+    base name, or to load the file without a namespace when it is the only rule
+    set.
+
+    Example:
+
+        options := DefaultValidationOptions().WithRuleSet("", "rulesets/eu.json")
 
 func (o *ValidationOptions) WithSchemaCacheDir(dir string) *ValidationOptions
     WithSchemaCacheDir sets schema cache directory
@@ -538,15 +566,15 @@ func (o *ValidationOptions) WithSeverityOverride(ruleCode string, severity types
     rules based on local requirements or data quality considerations.
 
     Parameters:
-      - ruleCode: The rule identifier (e.g., "LINE_2", "SERVICE_JOURNEY_4")
+      - ruleCode: The full rule ID (e.g., "line/2", "eu/service_journey/4")
       - severity: The new severity level (types.INFO, types.WARNING,
         types.ERROR, types.CRITICAL)
 
     Example:
 
         options := DefaultValidationOptions().
-        	WithSeverityOverride("LINE_3", types.ERROR).     // Treat warning as error
-        	WithSeverityOverride("ROUTE_2", types.WARNING)   // Reduce error to warning
+        	WithSeverityOverride("line/3", types.ERROR).     // Treat warning as error
+        	WithSeverityOverride("route/2", types.WARNING)   // Reduce error to warning
 
 func (o *ValidationOptions) WithSkipSchema(skip bool) *ValidationOptions
     WithSkipSchema configures whether to skip XML schema validation and returns
@@ -579,6 +607,8 @@ func (o *ValidationOptions) WithVerbose(verbose bool) *ValidationOptions
         options := DefaultValidationOptions().WithVerbose(true)  // Enable debug output
 
 type ValidationReportEntry struct {
+	// RuleID is the full rule ID, e.g. "line/2" or "eu/line/2" for rules from JSON rule sets
+	RuleID   string                   `json:"ruleId,omitempty"`
 	Name     string                   `json:"name"`
 	Message  string                   `json:"message"`
 	Severity types.Severity           `json:"severity"`
@@ -642,7 +672,7 @@ func ValidateContent(content []byte, filename string, options *ValidationOptions
     Example:
 
         xmlContent := []byte(`<?xml version="1.0"?>...`)
-        options := netexvalidator.DefaultValidationOptions().WithCodespace("SE")
+        options := netexvalidator.DefaultValidationOptions().WithCodespace("SE").WithRuleSet("", "rulesets/eu.json")
         result, err := netexvalidator.ValidateContent(xmlContent, "in-memory.xml", options)
 
 func ValidateFile(filePath string, options *ValidationOptions) (*ValidationResult, error)
@@ -662,7 +692,7 @@ func ValidateFile(filePath string, options *ValidationOptions) (*ValidationResul
 
     Example:
 
-        options := netexvalidator.DefaultValidationOptions().WithCodespace("NO")
+        options := netexvalidator.DefaultValidationOptions().WithCodespace("NO").WithRuleSet("", "rulesets/eu.json")
         result, err := netexvalidator.ValidateFile("timetable.xml", options)
         if err != nil {
         	log.Fatal(err)
@@ -686,7 +716,7 @@ func ValidateZip(zipPath string, options *ValidationOptions) (*ValidationResult,
 
     Example:
 
-        options := netexvalidator.DefaultValidationOptions().WithCodespace("DK")
+        options := netexvalidator.DefaultValidationOptions().WithCodespace("DK").WithRuleSet("", "rulesets/eu.json")
         result, err := netexvalidator.ValidateZip("dataset.zip", options)
         if err != nil {
         	log.Fatal(err)

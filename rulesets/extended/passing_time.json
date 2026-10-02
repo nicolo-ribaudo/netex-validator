@@ -1,0 +1,34 @@
+{
+  "rules": {
+    "TIMETABLED_PASSING_TIME_NO_TIMES": {
+      "name": "TimetabledPassingTime missing times",
+      "message": "TimetabledPassingTime must have ArrivalTime or DepartureTime",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[not(ArrivalTime) and not(DepartureTime) and not(EarliestDepartureTime) and not(LatestArrivalTime)]"
+    },
+    "TIMETABLED_PASSING_TIME_NO_STOP_REF": {
+      "name": "TimetabledPassingTime missing stop reference",
+      "message": "TimetabledPassingTime must reference a StopPointInJourneyPattern",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[not(StopPointInJourneyPatternRef)]"
+    },
+    "TIMETABLED_PASSING_TIME_MISSING_VERSION": {
+      "name": "TimetabledPassingTime missing version",
+      "message": "TimetabledPassingTime should have version attribute",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime[not(@version)]"
+    },
+    "TIMETABLED_PASSING_TIME_INVALID_STOP_REF": {
+      "name": "Invalid StopPointInJourneyPatternRef",
+      "message": "StopPointInJourneyPatternRef does not reference existing StopPointInJourneyPattern",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney]/passingTimes/TimetabledPassingTime/StopPointInJourneyPatternRef[@ref and not(@ref = //journeyPatterns/*/pointsInSequence/StopPointInJourneyPattern/@id)]"
+    },
+    "SEQUENCE_ERROR": {
+      "name": "Passing time sequence error",
+      "message": "Passing times should increase through the journey",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/*/passingTimes/TimetabledPassingTime[position() > 1 and DepartureTime <= preceding-sibling::TimetabledPassingTime[1]/DepartureTime]"
+    }
+  }
+}

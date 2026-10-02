@@ -1,0 +1,78 @@
+{
+  "rules": {
+    "ON_LINE": {
+      "name": "Line with illegal TransportMode",
+      "message": "Line has illegal TransportMode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode and not(TransportMode = 'coach' or TransportMode = 'bus' or TransportMode = 'tram' or TransportMode = 'rail' or TransportMode = 'metro' or TransportMode = 'air' or TransportMode = 'taxi' or TransportMode = 'water' or TransportMode = 'cableway' or TransportMode = 'funicular' or TransportMode = 'unknown')]"
+    },
+    "ON_SERVICE_JOURNEY": {
+      "name": "ServiceJourney with illegal TransportMode",
+      "message": "ServiceJourney has illegal TransportMode",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/ServiceJourney[TransportMode and not(TransportMode = 'coach' or TransportMode = 'bus' or TransportMode = 'tram' or TransportMode = 'rail' or TransportMode = 'metro' or TransportMode = 'air' or TransportMode = 'taxi' or TransportMode = 'water' or TransportMode = 'cableway' or TransportMode = 'funicular' or TransportMode = 'unknown')]"
+    },
+    "TRANSPORT_SUB_MODE_BUS_INVALID": {
+      "name": "Line with invalid bus TransportSubMode",
+      "message": "Line has invalid TransportSubMode for bus transport",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode = 'bus' and TransportSubmode and not(TransportSubmode = 'localBus' or TransportSubmode = 'regionalBus' or TransportSubmode = 'expressBus' or TransportSubmode = 'nightBus' or TransportSubmode = 'postBus' or TransportSubmode = 'specialNeedsBus' or TransportSubmode = 'mobilityBus' or TransportSubmode = 'mobilityBusForRegisteredDisabled' or TransportSubmode = 'sightseeingBus' or TransportSubmode = 'shuttleBus' or TransportSubmode = 'schoolBus' or TransportSubmode = 'schoolAndPublicServiceBus' or TransportSubmode = 'railReplacementBus' or TransportSubmode = 'demandAndResponseBus' or TransportSubmode = 'airportLinkBus')]"
+    },
+    "TRANSPORT_SUB_MODE_RAIL_INVALID": {
+      "name": "Line with invalid rail TransportSubMode",
+      "message": "Line has invalid TransportSubMode for rail transport",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode = 'rail' and TransportSubmode and not(TransportSubmode = 'local' or TransportSubmode = 'highSpeedRail' or TransportSubmode = 'suburbanRailway' or TransportSubmode = 'regionalRail' or TransportSubmode = 'interregionalRail' or TransportSubmode = 'longDistance' or TransportSubmode = 'international' or TransportSubmode = 'sleeperRailService' or TransportSubmode = 'nightRail' or TransportSubmode = 'carTransportRailService' or TransportSubmode = 'touristRailway' or TransportSubmode = 'railShuttle')]"
+    },
+    "TRANSPORT_SUB_MODE_TRAM_INVALID": {
+      "name": "Line with invalid tram TransportSubMode",
+      "message": "Line has invalid TransportSubMode for tram transport",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][TransportMode = 'tram' and TransportSubmode and not(TransportSubmode = 'cityTram' or TransportSubmode = 'localTram' or TransportSubmode = 'regionalTram' or TransportSubmode = 'sightseeingTram' or TransportSubmode = 'shuttleTram' or TransportSubmode = 'trainTram')]"
+    },
+    "1": {
+      "name": "Invalid transport mode on Line",
+      "message": "Line has invalid transport mode",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine]/TransportMode[not(text() = 'coach' or text() = 'bus' or text() = 'tram' or text() = 'rail' or text() = 'metro' or text() = 'air' or text() = 'taxi' or text() = 'water' or text() = 'cableway' or text() = 'funicular' or text() = 'unknown')]"
+    },
+    "2": {
+      "name": "Invalid transport mode on ServiceJourney",
+      "message": "ServiceJourney has invalid transport mode",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney]/TransportMode[not(text() = 'coach' or text() = 'bus' or text() = 'tram' or text() = 'rail' or text() = 'metro' or text() = 'air' or text() = 'taxi' or text() = 'water' or text() = 'cableway' or text() = 'funicular' or text() = 'unknown')]"
+    },
+    "INVALID_LINE": {
+      "name": "Invalid transport mode on Line",
+      "message": "Line has invalid TransportMode value",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine]/TransportMode[not(text() = 'coach' or text() = 'bus' or text() = 'tram' or text() = 'rail' or text() = 'metro' or text() = 'air' or text() = 'taxi' or text() = 'water' or text() = 'cableway' or text() = 'funicular' or text() = 'unknown')]"
+    },
+    "INVALID_SERVICE_JOURNEY": {
+      "name": "Invalid transport mode on ServiceJourney",
+      "message": "ServiceJourney has invalid TransportMode value",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney]/TransportMode[not(text() = 'coach' or text() = 'bus' or text() = 'tram' or text() = 'rail' or text() = 'metro' or text() = 'air' or text() = 'taxi' or text() = 'water' or text() = 'cableway' or text() = 'funicular' or text() = 'unknown')]"
+    },
+    "INCOMPATIBLE_SERVICE_JOURNEY": {
+      "name": "Incompatible transport modes",
+      "message": "ServiceJourney transport mode incompatible with Line transport mode",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::ServiceJourney or self::DatedServiceJourney][TransportMode and TransportMode != //lines/*[self::Line or self::FlexibleLine][@id=current()/LineRef/@ref]/TransportMode]",
+      "skip": true
+    },
+    "MISSING_REQUIRED": {
+      "name": "Missing required transport mode",
+      "message": "TransportMode is required for all Lines and FlexibleLines",
+      "severity": "ERROR",
+      "xpath": "//lines/*[self::Line or self::FlexibleLine][not(TransportMode)]"
+    },
+    "HIERARCHY_INCONSISTENT": {
+      "name": "Inconsistent transport mode hierarchy",
+      "message": "Transport mode inconsistent between Line, Route, and ServiceJourney",
+      "severity": "WARNING",
+      "xpath": "//routes/Route[TransportMode and TransportMode != //lines/*[self::Line or self::FlexibleLine][@id=current()/LineRef/@ref]/TransportMode]",
+      "skip": true
+    }
+  }
+}

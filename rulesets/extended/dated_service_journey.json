@@ -1,0 +1,58 @@
+{
+  "rules": {
+    "1": {
+      "name": "DatedServiceJourney missing ServiceJourneyRef",
+      "message": "DatedServiceJourney is missing ServiceJourneyRef",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/DatedServiceJourney[not(ServiceJourneyRef)]"
+    },
+    "2": {
+      "name": "DatedServiceJourney missing OperatingDayRef",
+      "message": "DatedServiceJourney is missing OperatingDayRef",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/DatedServiceJourney[not(OperatingDayRef)]"
+    },
+    "3": {
+      "name": "DatedServiceJourney invalid OperatingDayRef",
+      "message": "DatedServiceJourney has invalid OperatingDayRef",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/DatedServiceJourney[OperatingDayRef]"
+    },
+    "NO_SERVICE_REF": {
+      "name": "DatedServiceJourney missing ServiceJourneyRef",
+      "message": "DatedServiceJourney must reference a ServiceJourney",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::DatedServiceJourney][not(ServiceJourneyRef)]"
+    },
+    "NO_OPERATING_DAY_REF": {
+      "name": "DatedServiceJourney missing OperatingDayRef",
+      "message": "DatedServiceJourney must reference an OperatingDay",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::DatedServiceJourney][not(OperatingDayRef)]"
+    },
+    "INVALID_SERVICE_REF": {
+      "name": "Invalid ServiceJourneyRef",
+      "message": "ServiceJourneyRef does not reference existing ServiceJourney",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::DatedServiceJourney]/ServiceJourneyRef[@ref and not(@ref = //vehicleJourneys/ServiceJourney/@id)]"
+    },
+    "INVALID_OPERATING_DAY_REF": {
+      "name": "Invalid OperatingDayRef",
+      "message": "OperatingDayRef does not reference existing OperatingDay",
+      "severity": "ERROR",
+      "xpath": "//vehicleJourneys/*[self::DatedServiceJourney]/OperatingDayRef[@ref and not(@ref = //operatingDays/OperatingDay/@id)]"
+    },
+    "MIXED_CALENDAR": {
+      "name": "Mixed calendar references",
+      "message": "DatedServiceJourney should not mix DayTypes with OperatingDay",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/*[self::DatedServiceJourney][dayTypes and OperatingDayRef]"
+    },
+    "OVERRIDE_TIMES": {
+      "name": "DatedServiceJourney overrides times",
+      "message": "DatedServiceJourney should not override ServiceJourney timetabled passing times",
+      "severity": "WARNING",
+      "xpath": "//vehicleJourneys/*[self::DatedServiceJourney][passingTimes]"
+    }
+  }
+}

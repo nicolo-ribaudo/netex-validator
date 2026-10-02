@@ -1,0 +1,65 @@
+{
+  "rules": {
+    "FLEXIBLE_QUAY_MISSING_STOP_PLACE": {
+      "name": "FlexibleQuay missing StopPlace reference",
+      "message": "FlexibleQuay should reference a FlexibleStopPlace",
+      "severity": "WARNING",
+      "xpath": "//FlexibleQuay[not(StopPlaceRef)]"
+    },
+    "HAIL_AND_RIDE_AREA_SIZE": {
+      "name": "HailAndRideArea size validation",
+      "message": "HailAndRideArea should have reasonable geographic bounds",
+      "severity": "WARNING",
+      "xpath": "//HailAndRideArea[not(Polygon) and not(gml:Polygon)]"
+    },
+    "1": {
+      "name": "FlexibleService missing FlexibleServiceType",
+      "message": "FlexibleService is missing FlexibleServiceType",
+      "severity": "ERROR",
+      "xpath": "//FlexibleService[not(FlexibleServiceType)]"
+    },
+    "2": {
+      "name": "FlexibleService invalid FlexibleServiceType",
+      "message": "FlexibleService has invalid FlexibleServiceType",
+      "severity": "ERROR",
+      "xpath": "//FlexibleService[FlexibleServiceType and not(FlexibleServiceType = 'dynamicPassengerInformation' or FlexibleServiceType = 'fixedHeadwayService' or FlexibleServiceType = 'fixedPassingTimes' or FlexibleServiceType = 'notFixedPassingTimes')]"
+    },
+    "MISSING_TYPE": {
+      "name": "FlexibleService missing FlexibleServiceType",
+      "message": "FlexibleService must specify FlexibleServiceType",
+      "severity": "ERROR",
+      "xpath": "//FlexibleService[not(FlexibleServiceType)]"
+    },
+    "INVALID_TYPE": {
+      "name": "FlexibleService invalid FlexibleServiceType",
+      "message": "FlexibleService has invalid FlexibleServiceType value",
+      "severity": "ERROR",
+      "xpath": "//FlexibleService/FlexibleServiceType[not(text() = 'dynamicPassengerInformation' or text() = 'fixedHeadwayService' or text() = 'fixedPassingTimes' or text() = 'notFixedPassingTimes')]"
+    },
+    "MISSING_TIMES": {
+      "name": "FlexibleService missing passing times",
+      "message": "FlexibleService with fixedPassingTimes should have timetabled passing times",
+      "severity": "WARNING",
+      "xpath": "//FlexibleService[FlexibleServiceType = 'fixedPassingTimes' and not(//vehicleJourneys/ServiceJourney[FlexibleServiceRef/@ref = current()/@id]/passingTimes)]",
+      "skip": true
+    },
+    "UNREFERENCED": {
+      "name": "Unreferenced FlexibleService",
+      "message": "FlexibleService should be referenced by at least one ServiceJourney",
+      "severity": "WARNING",
+      "xpath": "//FlexibleService[not(@id = //vehicleJourneys/ServiceJourney/FlexibleServiceRef/@ref)]"
+    },
+    "FLEXIBLE_AREA_NO_GEOMETRY": {
+      "name": "FlexibleArea missing geometry",
+      "message": "FlexibleArea should have geographic definition",
+      "severity": "ERROR",
+      "xpath": "//FlexibleArea[not(Polygon) and not(gml:Polygon) and not(areas)]"
+    },
+    "FLEXIBLE_STOP_PLACE_INCOMPLETE": {
+      "name": "Incomplete FlexibleStopPlace",
+      "message": "FlexibleStopPlace should have proper geographic bounds",
+      "severity": "WARNING",
+      "xpath": "//FlexibleStopPlace[not(areas) and not(Polygon) and not(gml:Polygon)]"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "1": {
+      "name": "FareZone missing Name",
+      "message": "FareZone must have a Name",
+      "severity": "ERROR",
+      "xpath": "//fareZones/FareZone[not(Name) or normalize-space(Name) = '']"
+    },
+    "2": {
+      "name": "TariffZone missing Name",
+      "message": "TariffZone must have a Name",
+      "severity": "ERROR",
+      "xpath": "//tariffZones/TariffZone[not(Name) or normalize-space(Name) = '']"
+    },
+    "3": {
+      "name": "FareProduct missing Name",
+      "message": "FareProduct must have a Name",
+      "severity": "ERROR",
+      "xpath": "//fareProducts/FareProduct[not(Name) or normalize-space(Name) = '']"
+    },
+    "4": {
+      "name": "Missing price for FareProduct",
+      "message": "FareProduct should have a price",
+      "severity": "WARNING",
+      "xpath": "//fareProducts/FareProduct[not(prices)]"
+    }
+  }
+}

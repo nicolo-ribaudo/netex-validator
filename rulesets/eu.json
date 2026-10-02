@@ -1,0 +1,18 @@
+{
+  "extends": {
+    "fare": "./eu/fare.json",
+    "group_of": "./eu/group_of.json",
+    "interchange": "./eu/interchange.json",
+    "journey_pattern": "./eu/journey_pattern.json",
+    "line": "./eu/line.json",
+    "responsibility_set": "./eu/responsibility_set.json",
+    "route": "./eu/route.json",
+    "service_calendar": "./eu/service_calendar.json",
+    "stop_point": "./eu/stop_point.json",
+    "tariff_zone": "./eu/tariff_zone.json",
+    "transport_mode": "./eu/transport_mode.json",
+    "type_of_service": "./eu/type_of_service.json",
+    "validity_conditions": "./eu/validity_conditions.json",
+    "version": "./eu/version.json"
+  }
+}

@@ -10,7 +10,7 @@ import (
 
 func TestIntegration_ValidMinimal(t *testing.T) {
 	testFile := filepath.Join("..", "testdata", "valid_minimal.xml")
-	options := DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(true)
+	options := testOptions(t).WithCodespace("TEST").WithSkipSchema(true)
 
 	result, err := ValidateFile(testFile, options)
 	if err != nil {
@@ -43,7 +43,7 @@ func TestIntegration_ValidMinimal(t *testing.T) {
 
 func TestIntegration_InvalidMissingElements(t *testing.T) {
 	testFile := filepath.Join("..", "testdata", "invalid_missing_elements.xml")
-	options := DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(true)
+	options := testOptions(t).WithCodespace("TEST").WithSkipSchema(true)
 
 	result, err := ValidateFile(testFile, options)
 	if err != nil {
@@ -99,7 +99,7 @@ func TestIntegration_InvalidMissingElements(t *testing.T) {
 
 func TestIntegration_InvalidTransportModes(t *testing.T) {
 	testFile := filepath.Join("..", "testdata", "invalid_transport_modes.xml")
-	options := DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(true)
+	options := testOptions(t).WithCodespace("TEST").WithSkipSchema(true)
 
 	result, err := ValidateFile(testFile, options)
 	if err != nil {
@@ -126,7 +126,7 @@ func TestIntegration_InvalidTransportModes(t *testing.T) {
 func TestIntegration_MalformedXML(t *testing.T) {
 	testFile := filepath.Join("..", "testdata", "malformed.xml")
 	// Enable schema validation but disable network access to properly detect malformed XML
-	options := DefaultValidationOptions().
+	options := testOptions(t).
 		WithCodespace("TEST").
 		WithSkipSchema(false).
 		WithAllowSchemaNetwork(false).
@@ -171,7 +171,7 @@ func TestIntegration_MalformedXML(t *testing.T) {
 func TestIntegration_EmptyFile(t *testing.T) {
 	testFile := filepath.Join("..", "testdata", "empty.xml")
 	// Enable schema validation but disable network access to avoid timeouts
-	options := DefaultValidationOptions().
+	options := testOptions(t).
 		WithCodespace("TEST").
 		WithSkipSchema(false).
 		WithAllowSchemaNetwork(false). // Disable network access
@@ -198,7 +198,7 @@ func TestIntegration_EmptyFile(t *testing.T) {
 
 func TestIntegration_InvalidNetexVersion(t *testing.T) {
 	testFile := filepath.Join("..", "testdata", "invalid_netex_version.xml")
-	options := DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(true)
+	options := testOptions(t).WithCodespace("TEST").WithSkipSchema(true)
 
 	result, err := ValidateFile(testFile, options)
 	if err != nil {
@@ -227,7 +227,7 @@ func TestIntegration_ValidationOptions(t *testing.T) {
 
 	// Test with schema validation disabled
 	t.Run("SkipSchema", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace("TEST").
 			WithSkipSchema(true).
 			WithSkipSchema(true)
@@ -242,7 +242,7 @@ func TestIntegration_ValidationOptions(t *testing.T) {
 
 	// Test with verbose mode
 	t.Run("Verbose", func(t *testing.T) {
-		options := DefaultValidationOptions().
+		options := testOptions(t).
 			WithCodespace("TEST").
 			WithSkipSchema(true).
 			WithVerbose(true)
@@ -257,7 +257,7 @@ func TestIntegration_ValidationOptions(t *testing.T) {
 
 	// Test with different codespace
 	t.Run("DifferentCodespace", func(t *testing.T) {
-		options := DefaultValidationOptions().WithCodespace("DIFFERENT").WithSkipSchema(true)
+		options := testOptions(t).WithCodespace("DIFFERENT").WithSkipSchema(true)
 
 		result, err := ValidateFile(testFile, options)
 		if err != nil {
@@ -272,7 +272,7 @@ func TestIntegration_ValidationOptions(t *testing.T) {
 
 func TestIntegration_OutputFormats(t *testing.T) {
 	testFile := filepath.Join("..", "testdata", "valid_minimal.xml")
-	options := DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(true)
+	options := testOptions(t).WithCodespace("TEST").WithSkipSchema(true)
 
 	result, err := ValidateFile(testFile, options)
 	if err != nil {
@@ -326,7 +326,7 @@ func TestIntegration_OutputFormats(t *testing.T) {
 
 func TestIntegration_PerformanceBaseline(t *testing.T) {
 	testFile := filepath.Join("..", "..", "testdata", "valid_minimal.xml")
-	options := DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(true)
+	options := testOptions(t).WithCodespace("TEST").WithSkipSchema(true)
 
 	// Baseline performance test
 	result, err := ValidateFile(testFile, options)

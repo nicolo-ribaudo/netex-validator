@@ -117,20 +117,20 @@ func TestValidationOptions_WithVerbose(t *testing.T) {
 func TestValidationOptions_WithRuleOverride(t *testing.T) {
 	options := DefaultValidationOptions()
 
-	result := options.WithRuleOverride("LINE_2", false)
+	result := options.WithRuleOverride("line/2", false)
 
 	if result != options {
 		t.Error("WithRuleOverride should return the same instance for chaining")
 	}
 
-	if options.RuleOverrides["LINE_2"] != false {
-		t.Error("expected rule LINE_2 to be disabled")
+	if options.RuleOverrides["line/2"] != false {
+		t.Error("expected rule line/2 to be disabled")
 	}
 
 	// Test enabling a rule
-	options.WithRuleOverride("ROUTE_3", true)
-	if options.RuleOverrides["ROUTE_3"] != true {
-		t.Error("expected rule ROUTE_3 to be enabled")
+	options.WithRuleOverride("route/3", true)
+	if options.RuleOverrides["route/3"] != true {
+		t.Error("expected rule route/3 to be enabled")
 	}
 
 	// Test with nil map (should initialize)
@@ -147,20 +147,20 @@ func TestValidationOptions_WithRuleOverride(t *testing.T) {
 func TestValidationOptions_WithSeverityOverride(t *testing.T) {
 	options := DefaultValidationOptions()
 
-	result := options.WithSeverityOverride("LINE_2", types.ERROR)
+	result := options.WithSeverityOverride("line/2", types.ERROR)
 
 	if result != options {
 		t.Error("WithSeverityOverride should return the same instance for chaining")
 	}
 
-	if options.SeverityOverrides["LINE_2"] != types.ERROR {
-		t.Errorf("expected rule LINE_2 severity to be ERROR, got %v", options.SeverityOverrides["LINE_2"])
+	if options.SeverityOverrides["line/2"] != types.ERROR {
+		t.Errorf("expected rule line/2 severity to be ERROR, got %v", options.SeverityOverrides["line/2"])
 	}
 
 	// Test with different severity
-	options.WithSeverityOverride("ROUTE_3", types.WARNING)
-	if options.SeverityOverrides["ROUTE_3"] != types.WARNING {
-		t.Errorf("expected rule ROUTE_3 severity to be WARNING, got %v", options.SeverityOverrides["ROUTE_3"])
+	options.WithSeverityOverride("route/3", types.WARNING)
+	if options.SeverityOverrides["route/3"] != types.WARNING {
+		t.Errorf("expected rule route/3 severity to be WARNING, got %v", options.SeverityOverrides["route/3"])
 	}
 
 	// Test with nil map (should initialize)
@@ -180,8 +180,8 @@ func TestValidationOptions_Chaining(t *testing.T) {
 		WithCodespace("SE").
 		WithVerbose(true).
 		WithSkipSchema(true).
-		WithRuleOverride("LINE_2", false).
-		WithSeverityOverride("ROUTE_3", types.ERROR).
+		WithRuleOverride("line/2", false).
+		WithSeverityOverride("route/3", types.ERROR).
 		WithConfigFile("custom.yaml")
 
 	// Verify all settings were applied
@@ -197,12 +197,12 @@ func TestValidationOptions_Chaining(t *testing.T) {
 		t.Error("expected SkipSchema to be true")
 	}
 
-	if options.RuleOverrides["LINE_2"] != false {
-		t.Error("expected rule LINE_2 to be disabled")
+	if options.RuleOverrides["line/2"] != false {
+		t.Error("expected rule line/2 to be disabled")
 	}
 
-	if options.SeverityOverrides["ROUTE_3"] != types.ERROR {
-		t.Error("expected rule ROUTE_3 severity to be ERROR")
+	if options.SeverityOverrides["route/3"] != types.ERROR {
+		t.Error("expected rule route/3 severity to be ERROR")
 	}
 
 	if options.ConfigFile != "custom.yaml" {

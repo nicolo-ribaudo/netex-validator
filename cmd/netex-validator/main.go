@@ -37,6 +37,8 @@ var (
 	cacheMaxEntries  int
 	cacheMaxMemoryMB int
 	cacheTTLHours    int
+	// ruleSets is filled by extractRuleArgs before cobra parses the flags
+	ruleSets []validator.RuleSet
 )
 
 func main() {
@@ -45,15 +47,21 @@ func main() {
 		Short: "NetEX validator for EU NeTEx Profile",
 		Long: `A comprehensive NetEX validator with extensive rule coverage that supports:
 - XML Schema validation
-- 88+ XPath-based business rules covering all major NetEX categories
+- XPath-based business rules loaded from JSON rule files (--rules)
 - ZIP dataset validation with cross-file ID validation
 - YAML configuration for rule customization
 - JSON and HTML output formats
 
+Rule files are passed with --rules, once per file:
+  --rules <path>  --rules=<path>                   namespace = file base name
+  --rules:<name> <path>  --rules:<name>=<path>     explicit namespace
+Rule IDs are <namespace>/<key>. A single --rules without a name is not
+namespaced. --rules is required unless --skip-validators is given.
+
 Examples:
-  netex-validator -i data.xml -c "MyCodespace"
-  netex-validator -i dataset.zip -c "MyCodespace" --format json
-  netex-validator -i data.xml -c "MyCodespace" --config custom-rules.yaml`,
+  netex-validator -i data.xml -c "MyCodespace" --rules rulesets/eu.json
+  netex-validator -i dataset.zip -c "MyCodespace" --rules rulesets/eu.json --rules ./local.json
+  netex-validator -i data.xml -c "MyCodespace" --rules:eu=rulesets/eu.json --config custom-rules.yaml`,
 		RunE: validateCommand,
 	}
 
@@ -64,12 +72,14 @@ Examples:
 	rootCmd.Flags().StringVarP(&codespace, "codespace", "c", "", "Validation codespace (required)")
 	rootCmd.Flags().BoolVar(&skipSchema, "skip-schema", false, "Skip XML Schema validation")
 	rootCmd.Flags().BoolVar(&skipValidators, "skip-validators", false, "Skip XPath business rule validation")
+	// Only registered for --help: extractRuleArgs consumes every --rules argument before cobra runs.
+	rootCmd.Flags().StringArray("rules", nil, "JSON rule file; repeat per file. Also --rules:<name>=<path> to set its namespace (required unless --skip-validators)")
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose output")
 	rootCmd.Flags().IntVar(&maxSchemaErrors, "max-schema-errors", 0, "Maximum schema errors to report (0 = use config default)")
 	rootCmd.Flags().StringVar(&configFile, "config", "", "Configuration file path")
 	rootCmd.Flags().BoolVar(&generateConfig, "generate-config", false, "Generate default configuration file")
 	// Profile flag retained for compatibility but ignored (EU is default)
-	rootCmd.Flags().StringVar(&profile, "profile", "", "(Deprecated) Validation profile – ignored; EU is default")
+	rootCmd.Flags().StringVar(&profile, "profile", "", "(Deprecated) Ignored; select rules with --rules")
 	rootCmd.Flags().IntVar(&maxFindings, "max-findings", 0, "Maximum number of findings to report (0 = unlimited)")
 	rootCmd.Flags().BoolVar(&allowSchemaNet, "allow-schema-network", true, "Allow downloading NetEX schemas from the network")
 	rootCmd.Flags().StringVar(&schemaCacheDir, "schema-cache-dir", "", "Directory to cache downloaded schemas")
@@ -109,6 +119,32 @@ Examples:
 	}
 	rootCmd.AddCommand(generateConfigCmd)
 
+	var rest []string
+	var err error
+	flags := rootCmd.Flags()
+	takesValue := func(arg string) bool {
+		if strings.Contains(arg, "=") {
+			return false // value given inline
+		}
+		var name string
+		switch {
+		case strings.HasPrefix(arg, "--"):
+			name = arg[2:]
+		case strings.HasPrefix(arg, "-") && len(arg) == 2:
+			if f := flags.ShorthandLookup(arg[1:]); f != nil {
+				name = f.Name
+			}
+		}
+		f := flags.Lookup(name)
+		return f != nil && f.NoOptDefVal == "" // boolean flags have a NoOptDefVal
+	}
+	ruleSets, rest, err = extractRuleArgs(os.Args[1:], takesValue)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error:", err)
+		os.Exit(1)
+	}
+	rootCmd.SetArgs(rest)
+
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -118,6 +154,10 @@ func validateCommand(cmd *cobra.Command, args []string) error {
 	// Handle generate-config flag
 	if generateConfig {
 		return generateDefaultConfig("netex-validator.yaml")
+	}
+
+	if len(ruleSets) == 0 && !skipValidators {
+		return fmt.Errorf("no rule files given: pass --rules <file.json> (repeatable), or --skip-validators")
 	}
 
 	// Validate input file exists
@@ -158,6 +198,8 @@ func validateCommand(cmd *cobra.Command, args []string) error {
 		WithSkipSchema(skipSchema).
 		WithVerbose(verbose).
 		WithConfigFile(configFile)
+	options.SkipValidators = skipValidators
+	options.RuleSets = ruleSets
 	if profile != "" {
 		options = options.WithProfile(profile)
 	}
@@ -306,14 +348,17 @@ validator:
   cacheTimeout: 30
 
 rules:
-  categories:
-    line:
-      enabled: true
-    route:
-      enabled: true
-    service_journey:
-      enabled: true
-    # Add other categories as needed
+  # Keyed by rule namespace, as in the rule IDs (e.g. "line" for "line/2",
+  # "eu/line" for "eu/line/2"). Disabling a namespace disables everything nested in it.
+  # Examples (uncomment to use):
+  categories: {}
+  #  line:
+  #    defaultSeverity: WARNING
+  #    rules:
+  #      "3":
+  #        severity: ERROR
+  #  route:
+  #    enabled: false
 
 output:
   format: "json"

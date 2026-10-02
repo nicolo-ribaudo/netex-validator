@@ -1,0 +1,52 @@
+{
+  "rules": {
+    "1": {
+      "name": "FlexibleLine missing FlexibleLineType",
+      "message": "FlexibleLine is missing FlexibleLineType",
+      "severity": "ERROR",
+      "xpath": "//lines/FlexibleLine[not(FlexibleLineType)]"
+    },
+    "10": {
+      "name": "FlexibleLine illegal use of both BookWhen and MinimumBookingPeriod",
+      "message": "FlexibleLine has illegal use of both BookWhen and MinimumBookingPeriod",
+      "severity": "WARNING",
+      "xpath": "//lines/FlexibleLine[BookWhen and MinimumBookingPeriod]"
+    },
+    "11": {
+      "name": "FlexibleLine BookWhen without LatestBookingTime or vice versa",
+      "message": "FlexibleLine has BookWhen without LatestBookingTime or vice versa",
+      "severity": "WARNING",
+      "xpath": "//lines/FlexibleLine[(BookWhen and not(LatestBookingTime)) or (not(BookWhen) and LatestBookingTime)]"
+    },
+    "TYPE_INVALID": {
+      "name": "FlexibleLine with invalid FlexibleLineType",
+      "message": "FlexibleLine has invalid FlexibleLineType",
+      "severity": "ERROR",
+      "xpath": "//lines/FlexibleLine[FlexibleLineType and not(FlexibleLineType = 'fixedStop' or FlexibleLineType = 'flexibleAreasOnly' or FlexibleLineType = 'hailAndRideAreas' or FlexibleLineType = 'flexibleAreasAndStops' or FlexibleLineType = 'hailAndRideSections' or FlexibleLineType = 'fixedStopAreaWide' or FlexibleLineType = 'freeAreaAreaWide' or FlexibleLineType = 'mixedFlexible' or FlexibleLineType = 'mixedFlexibleAndFixed' or FlexibleLineType = 'fixed' or FlexibleLineType = 'mainRouteWithFlexibleEnds' or FlexibleLineType = 'flexibleRoute')]"
+    },
+    "MISSING_TYPE": {
+      "name": "FlexibleLine missing FlexibleLineType",
+      "message": "FlexibleLine must specify FlexibleLineType",
+      "severity": "ERROR",
+      "xpath": "//lines/FlexibleLine[not(FlexibleLineType)]"
+    },
+    "INVALID_TYPE": {
+      "name": "FlexibleLine invalid FlexibleLineType",
+      "message": "FlexibleLine has invalid FlexibleLineType value",
+      "severity": "ERROR",
+      "xpath": "//lines/FlexibleLine/FlexibleLineType[not(text() = 'fixedStop' or text() = 'flexibleAreasOnly' or text() = 'hailAndRideAreas' or text() = 'flexibleAreasAndStops' or text() = 'hailAndRideSections' or text() = 'fixedStopAreaWide' or text() = 'freeAreaAreaWide' or text() = 'mixedFlexible' or text() = 'mixedFlexibleAndFixed' or text() = 'fixed' or text() = 'mainRouteWithFlexibleEnds' or text() = 'flexibleRoute' or text() = 'demandAndResponseServices')]"
+    },
+    "MISSING_BOOKING_INFO": {
+      "name": "FlexibleLine missing booking information",
+      "message": "FlexibleLine with flexible areas should have booking information",
+      "severity": "ERROR",
+      "xpath": "//lines/FlexibleLine[FlexibleLineType = 'flexibleAreasOnly' or FlexibleLineType = 'hailAndRideAreas' or FlexibleLineType = 'demandAndResponseServices'][not(BookWhen) and not(MinimumBookingPeriod) and not(bookingArrangements) and not(BookingContact) and not(BookingUrl)]"
+    },
+    "INVALID_TRANSPORT_MODE": {
+      "name": "FlexibleLine invalid transport mode",
+      "message": "FlexibleLine should use appropriate transport modes",
+      "severity": "WARNING",
+      "xpath": "//lines/FlexibleLine[TransportMode and not(TransportMode = 'bus' or TransportMode = 'taxi' or TransportMode = 'water' or TransportMode = 'unknown')]"
+    }
+  }
+}

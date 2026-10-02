@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "NON_NUMERIC": {
+      "name": "Non-numeric NeTEx version",
+      "message": "Element has non-numeric NeTEx version",
+      "severity": "WARNING",
+      "xpath": ".//*[@version != 'any' and number(@version) != number(@version)]"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"path"
 	"strings"
 	"testing"
 
@@ -11,17 +12,23 @@ import (
 )
 
 func TestXPathRules_Comprehensive(t *testing.T) {
-	// Create a rule registry to get all available rules
-	config := &config.ValidatorConfig{}
-	registry := rules.NewRuleRegistry(config).WithProfile("eu")
-	allRules := registry.GetEnabledRules()
+	// Load every shipped rule (both sets, namespaced as "eu/..." and "extended/...")
+	sets := []rules.RuleSet{
+		{Path: testutil.RuleSetPath(t, "eu")},
+		{Path: testutil.RuleSetPath(t, "extended")},
+	}
+	loaded, err := rules.LoadRuleSets(sets)
+	if err != nil {
+		t.Fatalf("Failed to load rule sets: %v", err)
+	}
+	allRules := rules.NewRuleRegistry(&config.ValidatorConfig{}, loaded).GetEnabledRules()
 
 	t.Logf("Testing %d XPath rules", len(allRules))
 
 	// Group rules by category for organized testing
 	ruleCategories := make(map[string][]rules.Rule)
 	for _, rule := range allRules {
-		category := extractRuleCategory(rule.Code)
+		category := rule.Category
 		ruleCategories[category] = append(ruleCategories[category], rule)
 	}
 
@@ -29,14 +36,14 @@ func TestXPathRules_Comprehensive(t *testing.T) {
 		t.Run("Category_"+category, func(t *testing.T) {
 			for _, rule := range categoryRules {
 				t.Run("Rule_"+rule.Code, func(t *testing.T) {
-					testSingleXPathRule(t, rule)
+					testSingleXPathRule(t, rule, sets)
 				})
 			}
 		})
 	}
 }
 
-func testSingleXPathRule(t *testing.T, rule rules.Rule) {
+func testSingleXPathRule(t *testing.T, rule rules.Rule, sets []rules.RuleSet) {
 	// Skip rules with unsupported XPath functions
 	if hasUnsupportedXPathFunctions(rule.XPath) {
 		t.Skipf("Rule %s contains unsupported XPath functions", rule.Code)
@@ -54,6 +61,7 @@ func testSingleXPathRule(t *testing.T, rule rules.Rule) {
 		WithCodespace(testutil.TestCodespace).
 		WithSkipSchema(true).
 		WithMaxFindings(10)
+	options.RuleSets = sets
 
 	validator, err := NewWithOptions(options)
 	if err != nil {
@@ -82,14 +90,6 @@ func testSingleXPathRule(t *testing.T, rule rules.Rule) {
 	}
 }
 
-func extractRuleCategory(ruleCode string) string {
-	parts := strings.Split(ruleCode, "_")
-	if len(parts) > 0 {
-		return parts[0]
-	}
-	return "UNKNOWN"
-}
-
 func hasUnsupportedXPathFunctions(xpath string) bool {
 	unsupportedFunctions := []string{
 		"current()",
@@ -112,11 +112,11 @@ func hasUnsupportedXPathFunctions(xpath string) bool {
 }
 
 func generateTestDataForRule(rule rules.Rule) string {
-	// Generate specific test cases based on rule code patterns
-	ruleCode := rule.Code
+	// Generate specific test cases based on "<file>/<key>", ignoring the rule set namespace
+	ruleCode := path.Base(rule.Category) + "/" + rule.Key
 
 	switch {
-	case strings.Contains(ruleCode, "LINE_MISSING_NAME"):
+	case ruleCode == "line/2":
 		return `<?xml version="1.0" encoding="UTF-8"?>
 <PublicationDelivery xmlns="http://www.netex.org.uk/netex" version="1.15">
 	<PublicationTimestamp>2023-01-01T00:00:00</PublicationTimestamp>
@@ -133,7 +133,7 @@ func generateTestDataForRule(rule rules.Rule) string {
 	</dataObjects>
 </PublicationDelivery>`
 
-	case strings.Contains(ruleCode, "LINE_MISSING_TRANSPORT_MODE"):
+	case ruleCode == "line/4":
 		return `<?xml version="1.0" encoding="UTF-8"?>
 <PublicationDelivery xmlns="http://www.netex.org.uk/netex" version="1.15">
 	<PublicationTimestamp>2023-01-01T00:00:00</PublicationTimestamp>
@@ -150,7 +150,7 @@ func generateTestDataForRule(rule rules.Rule) string {
 	</dataObjects>
 </PublicationDelivery>`
 
-	case strings.Contains(ruleCode, "ROUTE_MISSING_NAME"):
+	case ruleCode == "route/2", ruleCode == "route/MISSING_NAME":
 		return `<?xml version="1.0" encoding="UTF-8"?>
 <PublicationDelivery xmlns="http://www.netex.org.uk/netex" version="1.15">
 	<PublicationTimestamp>2023-01-01T00:00:00</PublicationTimestamp>
@@ -167,7 +167,7 @@ func generateTestDataForRule(rule rules.Rule) string {
 	</dataObjects>
 </PublicationDelivery>`
 
-	case strings.Contains(ruleCode, "ROUTE_MISSING_LINE_REF"):
+	case ruleCode == "route/3":
 		return `<?xml version="1.0" encoding="UTF-8"?>
 <PublicationDelivery xmlns="http://www.netex.org.uk/netex" version="1.15">
 	<PublicationTimestamp>2023-01-01T00:00:00</PublicationTimestamp>
@@ -184,7 +184,7 @@ func generateTestDataForRule(rule rules.Rule) string {
 	</dataObjects>
 </PublicationDelivery>`
 
-	case strings.Contains(ruleCode, "TRANSPORT_MODE"):
+	case strings.HasPrefix(ruleCode, "transport_mode/"), strings.HasPrefix(ruleCode, "transport_submode/"):
 		return `<?xml version="1.0" encoding="UTF-8"?>
 <PublicationDelivery xmlns="http://www.netex.org.uk/netex" version="1.15">
 	<PublicationTimestamp>2023-01-01T00:00:00</PublicationTimestamp>
@@ -204,7 +204,7 @@ func generateTestDataForRule(rule rules.Rule) string {
 	</dataObjects>
 </PublicationDelivery>`
 
-	case strings.Contains(ruleCode, "NETEX_VERSION"):
+	case strings.HasPrefix(ruleCode, "version/"):
 		return `<?xml version="1.0" encoding="UTF-8"?>
 <PublicationDelivery xmlns="http://www.netex.org.uk/netex" version="non-numeric">
 	<PublicationTimestamp>2023-01-01T00:00:00</PublicationTimestamp>
@@ -232,7 +232,7 @@ func generateTestDataForRule(rule rules.Rule) string {
 	</dataObjects>
 </PublicationDelivery>`
 
-	case strings.Contains(ruleCode, "STOP_PLACE"):
+	case strings.HasPrefix(ruleCode, "stop_place/"):
 		return `<?xml version="1.0" encoding="UTF-8"?>
 <PublicationDelivery xmlns="http://www.netex.org.uk/netex" version="1.15">
 	<PublicationTimestamp>2023-01-01T00:00:00</PublicationTimestamp>
@@ -248,7 +248,7 @@ func generateTestDataForRule(rule rules.Rule) string {
 	</dataObjects>
 </PublicationDelivery>`
 
-	case strings.Contains(ruleCode, "SERVICE_JOURNEY"):
+	case strings.HasPrefix(ruleCode, "service_journey/"):
 		return `<?xml version="1.0" encoding="UTF-8"?>
 <PublicationDelivery xmlns="http://www.netex.org.uk/netex" version="1.15">
 	<PublicationTimestamp>2023-01-01T00:00:00</PublicationTimestamp>
@@ -264,7 +264,7 @@ func generateTestDataForRule(rule rules.Rule) string {
 	</dataObjects>
 </PublicationDelivery>`
 
-	case strings.Contains(ruleCode, "JOURNEY_PATTERN"):
+	case strings.HasPrefix(ruleCode, "journey_pattern/"):
 		return `<?xml version="1.0" encoding="UTF-8"?>
 <PublicationDelivery xmlns="http://www.netex.org.uk/netex" version="1.15">
 	<PublicationTimestamp>2023-01-01T00:00:00</PublicationTimestamp>
@@ -338,12 +338,12 @@ func TestXPathRules_SeverityOverrides(t *testing.T) {
 	t.Run("Override rule severities", func(t *testing.T) {
 		// Create validation options with severity overrides
 		severityOverrides := map[string]types.Severity{
-			"LINE_2":  types.CRITICAL, // Line missing Name - Usually ERROR
-			"ROUTE_2": types.WARNING,  // Route missing Name - Usually ERROR
-			"LINE_4":  types.INFO,     // Line missing TransportMode - Usually ERROR
+			"line/2":  types.CRITICAL, // Line missing Name - Usually ERROR
+			"route/2": types.WARNING,  // Route missing Name - Usually ERROR
+			"line/4":  types.INFO,     // Line missing TransportMode - Usually ERROR
 		}
 
-		options := DefaultValidationOptions()
+		options := testOptions(t)
 		options.Codespace = testutil.TestCodespace
 		options.SkipSchema = true
 		options.SeverityOverrides = severityOverrides
@@ -411,13 +411,13 @@ func TestXPathRules_RuleEnableDisable(t *testing.T) {
 	t.Run("Disable specific rules", func(t *testing.T) {
 		// Disable some rules
 		ruleOverrides := map[string]bool{
-			"LINE_2":             false, // Disable "Line missing Name" rule
-			"ROUTE_2":            false, // Disable "Route missing Name" rule (builtin)
-			"ROUTE_MISSING_NAME": false, // Disable "Route missing Name" rule (business)
-			"LINE_4":             true,  // Keep "Line missing TransportMode" rule enabled
+			"line/2":             false, // Disable "Line missing Name" rule
+			"route/2":            false, // Disable "Route missing Name" rule (builtin)
+			"route/MISSING_NAME": false, // Disable "Route missing Name" rule (business)
+			"line/4":             true,  // Keep "Line missing TransportMode" rule enabled
 		}
 
-		options := DefaultValidationOptions()
+		options := testOptions(t)
 		options.Codespace = testutil.TestCodespace
 		options.SkipSchema = true
 		options.RuleOverrides = ruleOverrides
@@ -470,7 +470,7 @@ func TestXPathRules_RuleEnableDisable(t *testing.T) {
 }
 
 func BenchmarkXPathRules_AllRules(b *testing.B) {
-	options := DefaultValidationOptions().
+	options := testOptions(b).
 		WithCodespace(testutil.TestCodespace).
 		WithSkipSchema(true)
 

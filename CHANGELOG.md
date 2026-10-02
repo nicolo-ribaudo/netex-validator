@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (breaking)
+- XPath business rules are no longer compiled into the binary. They are loaded from JSON rule
+  files passed with `--rules <file>` / `--rules:<name>=<file>` (repeatable), or with
+  `ValidationOptions.RuleSets` / `WithRuleSet` in the library. `--rules` is required unless
+  `--skip-validators` is given. The previous default rules ship as `rulesets/eu.json`.
+- Rule IDs are now `<namespace>/<key>` (e.g. `line/2` instead of `LINE_2`). The namespace is the
+  `--rules:<name>`, or the file base name when several rule files are passed; a single unnamed
+  rule file is not namespaced. `RuleOverrides`, `SeverityOverrides` and the YAML `rules.categories`
+  configuration use these IDs.
+- 15 rule codes that were defined twice for different checks were disambiguated with a `_B`
+  suffix (e.g. `journey_pattern/1_B`).
+- `rules.NewRuleRegistry` now takes the rules to hold; `RuleRegistry.WithProfile` was removed.
+- `config.IsRuleEnabled` and `config.GetRuleSeverity` take a namespace and rule key; the YAML
+  `enabled` fields of categories and rules are now optional (unset = enabled); custom rules still
+  need `enabled: true`. Entries and overrides that match no loaded rule are reported as warnings.
+
+### Added
+- Rule files can include other files under nested namespaces with `"extends"`.
+- Rules can be kept but disabled with `"skip": true`. The 7 rules using the unsupported XPath
+  function `current()`, which never ran, are marked this way.
+- `rulesets/extended.json`: the rules that were previously defined but filtered out by the
+  hard-coded EU profile.
+- Report entries now include the rule ID (`ruleId`), and grouped JSON notices list the IDs of
+  the rules they contain (`ruleIds`).
+
+### Fixed
+- `--skip-validators` was ignored by the CLI.
+
 ## [1.0.2] - 2025-09-01
 
 ### Added

@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "1": {
+      "name": "ResponsibilitySet missing Name",
+      "message": "ResponsibilitySet is missing Name",
+      "severity": "WARNING",
+      "xpath": "//ResponsibilitySet[not(Name) or normalize-space(Name) = '']"
+    },
+    "2": {
+      "name": "ResponsibilitySet missing roles",
+      "message": "ResponsibilitySet is missing roles",
+      "severity": "ERROR",
+      "xpath": "//ResponsibilitySet[not(roles)]"
+    }
+  }
+}

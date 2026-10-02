@@ -72,7 +72,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestNewWithOptions(t *testing.T) {
-	options := DefaultValidationOptions().
+	options := testOptions(t).
 		WithCodespace("TEST").
 		WithVerbose(true).
 		WithSkipSchema(true) // Skip schema for tests to avoid network timeouts
@@ -102,7 +102,7 @@ func TestValidateContent(t *testing.T) {
 			filename:     "test.xml",
 			expectError:  false,
 			expectIssues: false, // May have some issues, but should not error
-			options:      DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(true),
+			options:      testOptions(t).WithCodespace("TEST").WithSkipSchema(true),
 		},
 		{
 			name:         "invalid NetEX content",
@@ -110,7 +110,7 @@ func TestValidateContent(t *testing.T) {
 			filename:     "invalid.xml",
 			expectError:  false,
 			expectIssues: true, // Should find validation issues
-			options:      DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(true),
+			options:      testOptions(t).WithCodespace("TEST").WithSkipSchema(true),
 		},
 		{
 			name:         "malformed XML",
@@ -118,7 +118,7 @@ func TestValidateContent(t *testing.T) {
 			filename:     "malformed.xml",
 			expectError:  false, // Should handle gracefully
 			expectIssues: true,  // Should report XML issues
-			options:      DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(false).WithAllowSchemaNetwork(false).WithSchemaTimeoutSeconds(5),
+			options:      testOptions(t).WithCodespace("TEST").WithSkipSchema(false).WithAllowSchemaNetwork(false).WithSchemaTimeoutSeconds(5),
 		},
 		{
 			name:         "empty content",
@@ -126,7 +126,7 @@ func TestValidateContent(t *testing.T) {
 			filename:     "empty.xml",
 			expectError:  false,
 			expectIssues: true, // Should report as invalid
-			options:      DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(false).WithAllowSchemaNetwork(false).WithSchemaTimeoutSeconds(5),
+			options:      testOptions(t).WithCodespace("TEST").WithSkipSchema(false).WithAllowSchemaNetwork(false).WithSchemaTimeoutSeconds(5),
 		},
 	}
 
@@ -183,7 +183,7 @@ func TestValidateFile(t *testing.T) {
 	}
 	_ = tmpFile.Close()
 
-	options := DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(true)
+	options := testOptions(t).WithCodespace("TEST").WithSkipSchema(true)
 
 	result, err := ValidateFile(tmpFile.Name(), options)
 	if err != nil {
@@ -200,7 +200,7 @@ func TestValidateFile(t *testing.T) {
 }
 
 func TestValidateFile_NonExistent(t *testing.T) {
-	options := DefaultValidationOptions().WithCodespace("TEST").WithSkipSchema(true)
+	options := testOptions(t).WithCodespace("TEST").WithSkipSchema(true)
 
 	result, err := ValidateFile("nonexistent.xml", options)
 	if err != nil {

@@ -1,0 +1,64 @@
+{
+  "rules": {
+    "1": {
+      "name": "JourneyPattern missing RouteRef",
+      "message": "JourneyPattern is missing RouteRef",
+      "severity": "ERROR",
+      "xpath": "//journeyPatterns/JourneyPattern[not(RouteRef)]"
+    },
+    "2": {
+      "name": "JourneyPattern missing pointsInSequence",
+      "message": "JourneyPattern is missing pointsInSequence",
+      "severity": "ERROR",
+      "xpath": "//journeyPatterns/JourneyPattern[not(pointsInSequence)]"
+    },
+    "1_B": {
+      "name": "JourneyPattern missing Name",
+      "message": "JourneyPattern should have a Name",
+      "severity": "WARNING",
+      "xpath": "//journeyPatterns/*[self::JourneyPattern or self::ServiceJourneyPattern][not(Name) or normalize-space(Name) = '']"
+    },
+    "2_B": {
+      "name": "JourneyPattern missing RouteRef",
+      "message": "JourneyPattern must reference a Route",
+      "severity": "ERROR",
+      "xpath": "//journeyPatterns/*[self::JourneyPattern or self::ServiceJourneyPattern][not(RouteRef)]"
+    },
+    "3": {
+      "name": "JourneyPattern missing StopPoints",
+      "message": "JourneyPattern must have stop points",
+      "severity": "ERROR",
+      "xpath": "//journeyPatterns/*[self::JourneyPattern or self::ServiceJourneyPattern][not(pointsInSequence) or count(pointsInSequence/StopPointInJourneyPattern) < 2]"
+    },
+    "4": {
+      "name": "StopPointInJourneyPattern missing order",
+      "message": "StopPointInJourneyPattern must have order",
+      "severity": "ERROR",
+      "xpath": "//journeyPatterns/*[self::JourneyPattern or self::ServiceJourneyPattern]/pointsInSequence/StopPointInJourneyPattern[not(@order)]"
+    },
+    "5": {
+      "name": "Duplicate order in JourneyPattern",
+      "message": "Order values must be unique within JourneyPattern",
+      "severity": "ERROR",
+      "xpath": "//journeyPatterns/*[self::JourneyPattern or self::ServiceJourneyPattern]/pointsInSequence/StopPointInJourneyPattern[@order = preceding-sibling::StopPointInJourneyPattern/@order or @order = following-sibling::StopPointInJourneyPattern/@order]"
+    },
+    "MISSING_NAME": {
+      "name": "JourneyPattern missing Name",
+      "message": "JourneyPattern should have descriptive Name",
+      "severity": "WARNING",
+      "xpath": "//journeyPatterns/*[self::JourneyPattern or self::ServiceJourneyPattern][not(Name) or normalize-space(Name) = '']"
+    },
+    "DUPLICATE_ORDER": {
+      "name": "Duplicate order in JourneyPattern",
+      "message": "StopPointInJourneyPattern order values must be unique",
+      "severity": "ERROR",
+      "xpath": "//journeyPatterns/*/pointsInSequence/StopPointInJourneyPattern[@order = preceding-sibling::StopPointInJourneyPattern/@order or @order = following-sibling::StopPointInJourneyPattern/@order]"
+    },
+    "INSUFFICIENT_STOPS": {
+      "name": "JourneyPattern has insufficient stops",
+      "message": "JourneyPattern must have at least 2 stops",
+      "severity": "ERROR",
+      "xpath": "//journeyPatterns/*[self::JourneyPattern or self::ServiceJourneyPattern][count(pointsInSequence/StopPointInJourneyPattern) < 2]"
+    }
+  }
+}
