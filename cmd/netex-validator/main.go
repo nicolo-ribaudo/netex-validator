@@ -151,6 +151,10 @@ Examples:
 }
 
 func validateCommand(cmd *cobra.Command, args []string) error {
+	// Flags were parsed fine: errors from here on (including "validation found
+	// errors") are not usage mistakes, so don't print the usage text after them.
+	cmd.SilenceUsage = true
+
 	// Handle generate-config flag
 	if generateConfig {
 		return generateDefaultConfig("netex-validator.yaml")
