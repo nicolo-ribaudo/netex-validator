@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/antchfx/xmlquery"
-	"github.com/theoremus-urban-solutions/netex-validator/logging"
-	"github.com/theoremus-urban-solutions/netex-validator/utils"
+	"github.com/nicolo-ribaudo/netex-validator/logging"
+	"github.com/nicolo-ribaudo/netex-validator/utils"
 )
 
 const (

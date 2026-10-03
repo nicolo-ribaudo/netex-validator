@@ -1,4 +1,4 @@
-package types // import "github.com/theoremus-urban-solutions/netex-validator/types"
+package types // import "github.com/nicolo-ribaudo/netex-validator/types"
 
 
 TYPES

@@ -1,8 +1,8 @@
 package engine
 
 import (
-	"github.com/theoremus-urban-solutions/netex-validator/types"
-	"github.com/theoremus-urban-solutions/netex-validator/validation/context"
+	"github.com/nicolo-ribaudo/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/validation/context"
 )
 
 // ObjectValidator defines the interface for object model-based validation

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 func boolPtr(b bool) *bool                         { return &b }

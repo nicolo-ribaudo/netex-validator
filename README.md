@@ -2,9 +2,12 @@
 
 [![Go Version](https://img.shields.io/badge/Go-1.21%2B-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](LICENSE)
-[![CI/CD](https://github.com/theoremus-urban-solutions/netex-validator/workflows/CI%2FCD/badge.svg)](https://github.com/theoremus-urban-solutions/netex-validator/actions)
+[![CI/CD](https://github.com/nicolo-ribaudo/netex-validator/workflows/CI%2FCD/badge.svg)](https://github.com/nicolo-ribaudo/netex-validator/actions)
 
 A comprehensive Go implementation of the NetEX validator for validating NetEX datasets against the EU NeTEx Profile. Available as both a Go library and command-line tool with advanced features including concurrent processing, validation caching, and comprehensive reporting.
+
+> [!NOTE]
+> This is a permanent fork of [theoremus-urban-solutions/netex-validator](https://github.com/theoremus-urban-solutions/netex-validator), originally developed by the Theoremus Urban Solutions team.
 
 ## ✨ Features
 
@@ -51,20 +54,20 @@ A comprehensive Go implementation of the NetEX validator for validating NetEX da
 ### Install via Go
 
 ```bash
-go install github.com/theoremus-urban-solutions/netex-validator/cmd/netex-validator@latest
+go install github.com/nicolo-ribaudo/netex-validator/cmd/netex-validator@latest
 ```
 
 ### Build from Source
 
 ```bash
-git clone https://github.com/theoremus-urban-solutions/netex-validator.git
+git clone https://github.com/nicolo-ribaudo/netex-validator.git
 cd netex-validator
 go build -o netex-validator cmd/netex-validator/main.go
 ```
 
 ### Download Pre-built Binaries
 
-Download the latest release from the [GitHub Releases page](https://github.com/theoremus-urban-solutions/netex-validator/releases).
+Download the latest release from the [GitHub Releases page](https://github.com/nicolo-ribaudo/netex-validator/releases).
 
 ## 📖 Usage
 
@@ -148,7 +151,7 @@ import (
     "fmt"
     "log"
     
-    "github.com/theoremus-urban-solutions/netex-validator/validator"
+    "github.com/nicolo-ribaudo/netex-validator/validator"
 )
 
 func main() {
@@ -185,8 +188,8 @@ func main() {
 package main
 
 import (
-    "github.com/theoremus-urban-solutions/netex-validator/types"
-    "github.com/theoremus-urban-solutions/netex-validator/validator"
+    "github.com/nicolo-ribaudo/netex-validator/types"
+    "github.com/nicolo-ribaudo/netex-validator/validator"
 )
 
 func main() {
@@ -233,7 +236,7 @@ package main
 
 import (
     "sync"
-    "github.com/theoremus-urban-solutions/netex-validator/validator"
+    "github.com/nicolo-ribaudo/netex-validator/validator"
 )
 
 func main() {
@@ -575,8 +578,8 @@ This project is licensed under the EUPL-1.2 License - see the [LICENSE](LICENSE)
 
 ## 🤝 Support & Community
 
-- **Issues**: Report bugs and request features on [GitHub Issues](https://github.com/theoremus-urban-solutions/netex-validator/issues)
-- **Discussions**: Join the conversation on [GitHub Discussions](https://github.com/theoremus-urban-solutions/netex-validator/discussions)
+- **Issues**: Report bugs and request features on [GitHub Issues](https://github.com/nicolo-ribaudo/netex-validator/issues)
+- **Discussions**: Join the conversation on [GitHub Discussions](https://github.com/nicolo-ribaudo/netex-validator/discussions)
 - **Documentation**: Additional documentation available in the [docs](docs/) directory
 
 ## 📝 Changelog
@@ -585,4 +588,4 @@ See [CHANGELOG.md](CHANGELOG.md) for a detailed list of changes and version hist
 
 ---
 
-**Made with ❤️ by the Theoremus Urban Solutions team**
+Originally created by the Theoremus Urban Solutions team as [theoremus-urban-solutions/netex-validator](https://github.com/theoremus-urban-solutions/netex-validator).

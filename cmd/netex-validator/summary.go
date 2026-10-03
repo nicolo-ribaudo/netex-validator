@@ -8,8 +8,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/theoremus-urban-solutions/netex-validator/types"
-	"github.com/theoremus-urban-solutions/netex-validator/validator"
+	"github.com/nicolo-ribaudo/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/validator"
 )
 
 // ANSI styles used by the summary.

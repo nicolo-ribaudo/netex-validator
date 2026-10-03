@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/config"
-	"github.com/theoremus-urban-solutions/netex-validator/rules"
-	"github.com/theoremus-urban-solutions/netex-validator/testutil"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/config"
+	"github.com/nicolo-ribaudo/netex-validator/rules"
+	"github.com/nicolo-ribaudo/netex-validator/testutil"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 func TestXPathRules_Comprehensive(t *testing.T) {

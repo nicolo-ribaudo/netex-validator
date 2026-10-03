@@ -21,8 +21,8 @@ import (
 	//   github.com/ChrisTrenkamp/xsel v0.9.14 (alternative)
 	//   github.com/iancoleman/orderedmap v0.2.0 (alternative pure Go approach)
 
-	verrors "github.com/theoremus-urban-solutions/netex-validator/reporting"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	verrors "github.com/nicolo-ribaudo/netex-validator/reporting"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // validateWithLibxml2 performs real XSD validation using libxml2

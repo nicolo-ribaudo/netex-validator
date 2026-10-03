@@ -3,7 +3,7 @@ package ids
 import (
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 const unresolvedReferenceCode = "NETEX_ID_5"

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	errors "github.com/theoremus-urban-solutions/netex-validator/reporting"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	errors "github.com/nicolo-ribaudo/netex-validator/reporting"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // ValidationResult represents the outcome of a NetEX validation

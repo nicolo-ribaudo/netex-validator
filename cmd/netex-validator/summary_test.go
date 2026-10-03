@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/types"
-	"github.com/theoremus-urban-solutions/netex-validator/validator"
+	"github.com/nicolo-ribaudo/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/validator"
 )
 
 func entry(id, name string, sev types.Severity) validator.ValidationReportEntry {

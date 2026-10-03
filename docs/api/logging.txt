@@ -1,4 +1,4 @@
-package logging // import "github.com/theoremus-urban-solutions/netex-validator/logging"
+package logging // import "github.com/nicolo-ribaudo/netex-validator/logging"
 
 
 FUNCTIONS

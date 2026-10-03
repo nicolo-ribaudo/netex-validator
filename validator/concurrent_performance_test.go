@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/theoremus-urban-solutions/netex-validator/testutil"
+	"github.com/nicolo-ribaudo/netex-validator/testutil"
 )
 
 func TestConcurrentValidation_StressTest(t *testing.T) {

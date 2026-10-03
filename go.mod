@@ -1,4 +1,4 @@
-module github.com/theoremus-urban-solutions/netex-validator
+module github.com/nicolo-ribaudo/netex-validator
 
 go 1.21
 

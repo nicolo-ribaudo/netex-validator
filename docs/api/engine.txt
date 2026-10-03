@@ -1,4 +1,4 @@
-package engine // import "github.com/theoremus-urban-solutions/netex-validator/validation/engine"
+package engine // import "github.com/nicolo-ribaudo/netex-validator/validation/engine"
 
 
 FUNCTIONS

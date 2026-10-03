@@ -22,7 +22,7 @@ Thank you for your interest in contributing to Netex Validator Go! This document
 
 ```bash
 # Clone the repository
-git clone https://github.com/theoremus-urban-solutions/netex-validator.git
+git clone https://github.com/nicolo-ribaudo/netex-validator.git
 cd netex-validator-go
 
 # Download dependencies
@@ -156,8 +156,8 @@ if err != nil {
 package core
 
 import (
-    "github.com/theoremus-urban-solutions/netex-validator/notice"
-    "github.com/theoremus-urban-solutions/netex-validator/schema"
+    "github.com/nicolo-ribaudo/netex-validator/notice"
+    "github.com/nicolo-ribaudo/netex-validator/schema"
 )
 
 type NewValidator struct {
@@ -216,9 +216,9 @@ package core_test
 
 import (
     "testing"
-    "github.com/theoremus-urban-solutions/netex-validator/validator/core"
-    "github.com/theoremus-urban-solutions/netex-validator/notice"
-    "github.com/theoremus-urban-solutions/netex-validator/schema"
+    "github.com/nicolo-ribaudo/netex-validator/validator/core"
+    "github.com/nicolo-ribaudo/netex-validator/notice"
+    "github.com/nicolo-ribaudo/netex-validator/schema"
 )
 
 func TestNewValidator(t *testing.T) {

@@ -3,8 +3,8 @@ package engine
 import (
 	"fmt"
 
-	"github.com/theoremus-urban-solutions/netex-validator/types"
-	"github.com/theoremus-urban-solutions/netex-validator/validation/context"
+	"github.com/nicolo-ribaudo/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/validation/context"
 )
 
 // NetworkConsistencyValidator validates network-level consistency using object model

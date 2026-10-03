@@ -1,4 +1,4 @@
-package rules // import "github.com/theoremus-urban-solutions/netex-validator/rules"
+package rules // import "github.com/nicolo-ribaudo/netex-validator/rules"
 
 
 FUNCTIONS

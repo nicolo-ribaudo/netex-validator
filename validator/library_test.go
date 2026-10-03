@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // Test data - minimal valid NetEX XML

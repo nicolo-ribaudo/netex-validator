@@ -6,7 +6,7 @@ package schema
 import (
 	"fmt"
 
-	verrors "github.com/theoremus-urban-solutions/netex-validator/reporting"
+	verrors "github.com/nicolo-ribaudo/netex-validator/reporting"
 )
 
 // validateWithLibxml2 is a stub when libxml2 build tag is not enabled

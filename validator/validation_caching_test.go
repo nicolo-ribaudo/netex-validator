@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/theoremus-urban-solutions/netex-validator/testutil"
+	"github.com/nicolo-ribaudo/netex-validator/testutil"
 )
 
 func TestValidationCaching_Basic(t *testing.T) {

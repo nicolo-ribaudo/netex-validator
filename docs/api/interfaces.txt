@@ -1,4 +1,4 @@
-package interfaces // import "github.com/theoremus-urban-solutions/netex-validator/interfaces"
+package interfaces // import "github.com/nicolo-ribaudo/netex-validator/interfaces"
 
 
 TYPES

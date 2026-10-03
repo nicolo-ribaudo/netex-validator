@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/antchfx/xmlquery"
-	"github.com/theoremus-urban-solutions/netex-validator/interfaces"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/interfaces"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // NetexIdExtractor extracts NetEX IDs and references from XML content

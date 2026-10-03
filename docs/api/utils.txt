@@ -1,4 +1,4 @@
-package utils // import "github.com/theoremus-urban-solutions/netex-validator/utils"
+package utils // import "github.com/nicolo-ribaudo/netex-validator/utils"
 
 
 FUNCTIONS

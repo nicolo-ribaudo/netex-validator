@@ -1,7 +1,7 @@
 package ids
 
 import (
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // ExternalReferenceValidator validates references to external NetEX objects

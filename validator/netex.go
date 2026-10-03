@@ -6,7 +6,7 @@
 //
 // Basic usage:
 //
-//	import "github.com/theoremus-urban-solutions/netex-validator"
+//	import "github.com/nicolo-ribaudo/netex-validator"
 //
 //	// Simple validation
 //	options := netexvalidator.DefaultValidationOptions().
@@ -52,16 +52,16 @@ import (
 
 	"github.com/antchfx/xmlquery"
 	antxpath "github.com/antchfx/xpath"
-	"github.com/theoremus-urban-solutions/netex-validator/config"
-	"github.com/theoremus-urban-solutions/netex-validator/interfaces"
-	"github.com/theoremus-urban-solutions/netex-validator/logging"
-	"github.com/theoremus-urban-solutions/netex-validator/rules"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
-	"github.com/theoremus-urban-solutions/netex-validator/utils"
-	"github.com/theoremus-urban-solutions/netex-validator/validation/context"
-	"github.com/theoremus-urban-solutions/netex-validator/validation/engine"
-	"github.com/theoremus-urban-solutions/netex-validator/validation/ids"
-	xsdpkg "github.com/theoremus-urban-solutions/netex-validator/validation/schema"
+	"github.com/nicolo-ribaudo/netex-validator/config"
+	"github.com/nicolo-ribaudo/netex-validator/interfaces"
+	"github.com/nicolo-ribaudo/netex-validator/logging"
+	"github.com/nicolo-ribaudo/netex-validator/rules"
+	"github.com/nicolo-ribaudo/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/utils"
+	"github.com/nicolo-ribaudo/netex-validator/validation/context"
+	"github.com/nicolo-ribaudo/netex-validator/validation/engine"
+	"github.com/nicolo-ribaudo/netex-validator/validation/ids"
+	xsdpkg "github.com/nicolo-ribaudo/netex-validator/validation/schema"
 )
 
 // NetexSchemaValidatorAdapter adapts XSDValidator to SchemaValidator interface

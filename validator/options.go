@@ -1,9 +1,9 @@
 package validator
 
 import (
-	"github.com/theoremus-urban-solutions/netex-validator/logging"
-	"github.com/theoremus-urban-solutions/netex-validator/rules"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/logging"
+	"github.com/nicolo-ribaudo/netex-validator/rules"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // RuleSet is a JSON rule file loaded under a namespace. See rules.RuleSet.

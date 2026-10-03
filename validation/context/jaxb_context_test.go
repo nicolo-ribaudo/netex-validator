@@ -6,8 +6,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/testutil"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/testutil"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 func TestJAXBValidationContext_Creation(t *testing.T) {

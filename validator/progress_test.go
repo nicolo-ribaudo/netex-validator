@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // eventRecorder collects progress events; it is safe for concurrent use.

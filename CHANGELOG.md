@@ -131,5 +131,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Initial release - see Unreleased section above for features_
 
-[Unreleased]: https://github.com/theoremus-urban-solutions/netex-validator/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/theoremus-urban-solutions/netex-validator/releases/tag/v0.1.0
+[Unreleased]: https://github.com/nicolo-ribaudo/netex-validator/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/nicolo-ribaudo/netex-validator/releases/tag/v0.1.0

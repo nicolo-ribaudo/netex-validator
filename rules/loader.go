@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	antxpath "github.com/antchfx/xpath"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // RuleSet is a JSON rule file loaded under a namespace.

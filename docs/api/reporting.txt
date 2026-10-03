@@ -1,4 +1,4 @@
-package reporting // import "github.com/theoremus-urban-solutions/netex-validator/reporting"
+package reporting // import "github.com/nicolo-ribaudo/netex-validator/reporting"
 
 
 TYPES

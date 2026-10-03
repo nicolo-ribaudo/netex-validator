@@ -3,8 +3,8 @@ package engine
 import (
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/testutil"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/testutil"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 func TestEnhancedNetexValidatorsRunner_ValidateContent(t *testing.T) {

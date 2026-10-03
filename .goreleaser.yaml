@@ -32,7 +32,7 @@ archives:
 
 release:
   github:
-    owner: theoremus-urban-solutions
+    owner: nicolo-ribaudo
     name: netex-validator
 
 changelog:

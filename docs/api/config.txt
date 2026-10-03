@@ -1,4 +1,4 @@
-package config // import "github.com/theoremus-urban-solutions/netex-validator/config"
+package config // import "github.com/nicolo-ribaudo/netex-validator/config"
 
 
 FUNCTIONS

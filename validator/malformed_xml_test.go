@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/testutil"
+	"github.com/nicolo-ribaudo/netex-validator/testutil"
 )
 
 func TestMalformedXML_Recovery(t *testing.T) {

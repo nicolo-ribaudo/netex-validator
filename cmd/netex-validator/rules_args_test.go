@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/validator"
+	"github.com/nicolo-ribaudo/netex-validator/validator"
 )
 
 func TestExtractRuleArgs(t *testing.T) {

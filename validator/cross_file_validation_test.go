@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/testutil"
+	"github.com/nicolo-ribaudo/netex-validator/testutil"
 )
 
 func TestCrossFileValidation_IdReferences(t *testing.T) {

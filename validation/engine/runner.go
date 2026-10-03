@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/antchfx/xmlquery"
-	"github.com/theoremus-urban-solutions/netex-validator/interfaces"
-	"github.com/theoremus-urban-solutions/netex-validator/logging"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
-	"github.com/theoremus-urban-solutions/netex-validator/validation/context"
-	"github.com/theoremus-urban-solutions/netex-validator/validation/ids"
+	"github.com/nicolo-ribaudo/netex-validator/interfaces"
+	"github.com/nicolo-ribaudo/netex-validator/logging"
+	"github.com/nicolo-ribaudo/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/validation/context"
+	"github.com/nicolo-ribaudo/netex-validator/validation/ids"
 )
 
 // EnhancedNetexValidatorsRunner orchestrates NetEX validation with improved architecture

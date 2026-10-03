@@ -1,4 +1,4 @@
-package validator // import "github.com/theoremus-urban-solutions/netex-validator/validator"
+package validator // import "github.com/nicolo-ribaudo/netex-validator/validator"
 
 Package netexvalidator provides a comprehensive NetEX validation library for Go
 applications.
@@ -9,7 +9,7 @@ files, and cross-file ID validation.
 
 Basic usage:
 
-    import "github.com/theoremus-urban-solutions/netex-validator"
+    import "github.com/nicolo-ribaudo/netex-validator"
 
     // Simple validation
     options := netexvalidator.DefaultValidationOptions().

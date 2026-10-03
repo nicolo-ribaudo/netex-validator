@@ -8,9 +8,9 @@ import (
 	"runtime/pprof"
 	"strings"
 
+	"github.com/nicolo-ribaudo/netex-validator/logging"
+	"github.com/nicolo-ribaudo/netex-validator/validator"
 	"github.com/spf13/cobra"
-	"github.com/theoremus-urban-solutions/netex-validator/logging"
-	"github.com/theoremus-urban-solutions/netex-validator/validator"
 )
 
 var (

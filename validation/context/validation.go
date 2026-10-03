@@ -2,7 +2,7 @@ package context
 
 import (
 	"github.com/antchfx/xmlquery"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // ValidationContext represents the context for validation operations

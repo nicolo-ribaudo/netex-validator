@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/theoremus-urban-solutions/netex-validator/testutil"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/testutil"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 const (

@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/antchfx/xmlquery"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
-	"github.com/theoremus-urban-solutions/netex-validator/validation/context"
+	"github.com/nicolo-ribaudo/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/validation/context"
 )
 
 // EnhancedObjectRunner runs object model validation with data collection

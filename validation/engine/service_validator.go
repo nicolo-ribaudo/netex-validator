@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/theoremus-urban-solutions/netex-validator/types"
-	"github.com/theoremus-urban-solutions/netex-validator/validation/context"
+	"github.com/nicolo-ribaudo/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/validation/context"
 )
 
 // ServiceJourneyObjectValidator validates service journey business logic using object model

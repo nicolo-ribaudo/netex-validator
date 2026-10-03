@@ -180,7 +180,7 @@ docs: .FORCE ## Generate documentation
 
 docs-serve: ## Start documentation server
 	@echo "Starting documentation server at http://localhost:6060"
-	@echo "Visit: http://localhost:6060/pkg/github.com/theoremus-urban-solutions/netex-validator/"
+	@echo "Visit: http://localhost:6060/pkg/github.com/nicolo-ribaudo/netex-validator/"
 	@godoc -http=:6060
 
 docs-clean: ## Clean generated documentation

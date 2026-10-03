@@ -1,4 +1,4 @@
-package schema // import "github.com/theoremus-urban-solutions/netex-validator/validation/schema"
+package schema // import "github.com/nicolo-ribaudo/netex-validator/validation/schema"
 
 
 VARIABLES

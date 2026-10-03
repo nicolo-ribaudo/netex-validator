@@ -3,9 +3,9 @@ package rules
 import (
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/config"
-	"github.com/theoremus-urban-solutions/netex-validator/testutil"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/config"
+	"github.com/nicolo-ribaudo/netex-validator/testutil"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 func TestRuleRegistryBasic(t *testing.T) {

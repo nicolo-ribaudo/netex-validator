@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // ValidationError represents an enhanced validation error with context and suggestions.

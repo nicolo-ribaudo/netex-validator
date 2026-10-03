@@ -3,7 +3,7 @@ package validator
 import (
 	"testing"
 
-	"github.com/theoremus-urban-solutions/netex-validator/testutil"
+	"github.com/nicolo-ribaudo/netex-validator/testutil"
 )
 
 // testOptions returns the default options with the shipped EU rule set loaded

@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/theoremus-urban-solutions/netex-validator/logging"
-	errors "github.com/theoremus-urban-solutions/netex-validator/reporting"
+	"github.com/nicolo-ribaudo/netex-validator/logging"
+	errors "github.com/nicolo-ribaudo/netex-validator/reporting"
 )
 
 const (

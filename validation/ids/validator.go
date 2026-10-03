@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // NetexReferenceValidator validates references between NetEX elements

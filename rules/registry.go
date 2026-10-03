@@ -1,8 +1,8 @@
 package rules
 
 import (
-	"github.com/theoremus-urban-solutions/netex-validator/config"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/config"
+	"github.com/nicolo-ribaudo/netex-validator/types"
 )
 
 // Rule represents a single validation rule

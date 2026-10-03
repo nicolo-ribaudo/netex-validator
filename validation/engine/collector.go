@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/theoremus-urban-solutions/netex-validator/validation/context"
+	"github.com/nicolo-ribaudo/netex-validator/validation/context"
 )
 
 // DataCollector interface for collecting data during validation

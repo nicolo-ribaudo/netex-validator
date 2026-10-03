@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/theoremus-urban-solutions/netex-validator/types"
-	"github.com/theoremus-urban-solutions/netex-validator/validation/context"
+	"github.com/nicolo-ribaudo/netex-validator/types"
+	"github.com/nicolo-ribaudo/netex-validator/validation/context"
 )
 
 // XPathValidationRule represents a single XPath validation rule
