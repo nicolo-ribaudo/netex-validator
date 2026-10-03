@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2026-10-03
+
+### Fixed
+- Release archives now include `rulesets/eu.json` and `rulesets/extended.json`.
+
 ## [0.0.1] - 2026-10-03
 
 First release of this fork, based on [theoremus-urban-solutions/netex-validator](https://github.com/theoremus-urban-solutions/netex-validator) v1.0.5.
@@ -67,5 +72,6 @@ First release of this fork, based on [theoremus-urban-solutions/netex-validator]
 - Warnings and errors in the plain log format now include their context (file, error).
 - The CLI no longer prints the usage text after a validation run that found errors.
 
-[Unreleased]: https://github.com/nicolo-ribaudo/netex-validator/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/nicolo-ribaudo/netex-validator/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/nicolo-ribaudo/netex-validator/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/nicolo-ribaudo/netex-validator/releases/tag/v0.0.1
