@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ fork ]
   pull_request:
-    branches: [ main ]
+    branches: [ fork ]
   release:
     types: [ published ]
 
