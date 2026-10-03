@@ -124,6 +124,10 @@ type ValidationOptions struct {
 
 	// CacheTTLHours sets how long cached results remain valid (default: 24 hours)
 	CacheTTLHours int
+
+	// Progress, if set, receives progress events while validating. It may be
+	// called concurrently when files of a dataset are validated in parallel.
+	Progress types.ProgressFunc
 }
 
 // DefaultValidationOptions returns a ValidationOptions instance with sensible defaults.
@@ -399,4 +403,10 @@ func (o *ValidationOptions) GetLogger() *logging.Logger {
 	}
 
 	return logging.NewLogger(config)
+}
+
+// WithProgress sets a callback that receives progress events and returns the options for chaining.
+func (o *ValidationOptions) WithProgress(progress types.ProgressFunc) *ValidationOptions {
+	o.Progress = progress
+	return o
 }

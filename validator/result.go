@@ -34,8 +34,29 @@ type ValidationResult struct {
 	CacheHit bool   `json:"cacheHit,omitempty"`
 	FileHash string `json:"fileHash,omitempty"`
 
+	// Rules lists the XPath business rules that were configured for this validation.
+	Rules []RuleInfo `json:"-"`
+
+	// RuleChecksSkipped lists files whose XPath rule checks did not run because
+	// schema validation found errors (or the findings cap was reached) first.
+	RuleChecksSkipped []string `json:"ruleChecksSkipped,omitempty"`
+
+	// FailedFiles lists files of a dataset that could not be validated, as "file: error".
+	FailedFiles []string `json:"failedFiles,omitempty"`
+
+	// Truncated is set when the findings cap (MaxFindings) was reached, so
+	// validation stopped early and the results may be incomplete.
+	Truncated bool `json:"truncated,omitempty"`
+
 	// Raw content for statistics (not serialized to JSON)
 	rawContent map[string][]byte `json:"-"`
+}
+
+// RuleInfo describes a configured validation rule.
+type RuleInfo struct {
+	ID       string
+	Name     string
+	Severity types.Severity
 }
 
 // ValidationReportEntry represents a single validation issue
@@ -88,6 +109,9 @@ type ValidationSummary struct {
 
 // IsValid returns true if validation passed (no errors or critical issues)
 func (r *ValidationResult) IsValid() bool {
+	if len(r.FailedFiles) > 0 {
+		return false
+	}
 	for _, entry := range r.ValidationReportEntries {
 		if entry.Severity >= types.ERROR {
 			return false

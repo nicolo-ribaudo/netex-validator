@@ -132,6 +132,14 @@ type ValidationReport struct {
 	CreationDate                     time.Time               `json:"creationDate"`
 	ValidationReportEntries          []ValidationReportEntry `json:"validationReportEntries"`
 	NumberOfValidationEntriesPerRule map[string]int64        `json:"numberOfValidationEntriesPerRule"`
+	// RuleChecksSkipped lists files whose XPath rule checks did not run because
+	// schema validation found errors (or the findings cap was reached) first.
+	RuleChecksSkipped []string `json:"-"`
+	// FailedFiles lists files of a dataset that could not be validated, as "file: error".
+	FailedFiles []string `json:"-"`
+	// Truncated is set when the findings cap (MaxFindings) was reached, so
+	// validation stopped early and the report may be incomplete.
+	Truncated bool `json:"-"`
 }
 
 // NewValidationReport creates a new validation report

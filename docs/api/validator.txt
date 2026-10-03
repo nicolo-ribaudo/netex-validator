@@ -223,6 +223,12 @@ type OptimizedGroupedResult struct {
 	CacheHit       bool          `json:"cacheHit,omitempty"`
 	FileHash       string        `json:"fileHash,omitempty"`
 
+	// Incomplete validation
+	FailedFiles       []string `json:"failedFiles,omitempty"`
+	RuleChecksSkipped []string `json:"ruleChecksSkipped,omitempty"`
+	Truncated         bool     `json:"truncated,omitempty"`
+	Error             string   `json:"error,omitempty"`
+
 	// NetEX element statistics
 	Statistics NetEXStatistics `json:"statistics,omitempty"`
 }
@@ -285,6 +291,13 @@ type OptimizedSummary struct {
 	IsValid          bool `json:"isValid"`
 }
     OptimizedSummary provides enhanced summary with grouping insights
+
+type RuleInfo struct {
+	ID       string
+	Name     string
+	Severity types.Severity
+}
+    RuleInfo describes a configured validation rule.
 
 type RuleSet = rules.RuleSet
     RuleSet is a JSON rule file loaded under a namespace. See rules.RuleSet.
@@ -364,8 +377,8 @@ type ValidationOptions struct {
 	// Available levels: DEBUG, INFO, WARN, ERROR. Default is INFO.
 	LogLevel logging.LogLevel
 
-	// LogFormat specifies the log output format.
-	// Supported values: "text" (human-readable), "json" (structured). Default is "text".
+	// LogFormat specifies the log output format. Logs are written to stderr.
+	// Supported values: "plain" (message only), "text" (key=value), "json" (structured). Default is "plain".
 	LogFormat string
 
 	// Logger allows custom logger injection. If nil, a default logger is created
@@ -379,6 +392,8 @@ type ValidationOptions struct {
 	MaxFindings int
 
 	// AllowSchemaNetwork enables downloading schemas from network for XSD validation.
+	// Default is false: downloaded schemas are not used yet (XSD validation is a
+	// placeholder), and unreachable schema hosts can block validation for minutes.
 	AllowSchemaNetwork bool
 
 	// SchemaCacheDir specifies where downloaded schemas are cached.
@@ -406,6 +421,10 @@ type ValidationOptions struct {
 
 	// CacheTTLHours sets how long cached results remain valid (default: 24 hours)
 	CacheTTLHours int
+
+	// Progress, if set, receives progress events while validating. It may be
+	// called concurrently when files of a dataset are validated in parallel.
+	Progress types.ProgressFunc
 }
     ValidationOptions configures NetEX validation behavior.
 
@@ -482,7 +501,8 @@ func (o *ValidationOptions) WithLogFormat(format string) *ValidationOptions
     chaining.
 
     Supported formats:
-      - "text": Human-readable text format (default)
+      - "plain": Message only, one per line (default)
+      - "text": key=value format with timestamps, levels and context
       - "json": Structured JSON format for machine processing
 
     Example:
@@ -521,6 +541,10 @@ func (o *ValidationOptions) WithMaxFindings(n int) *ValidationOptions
 
 func (o *ValidationOptions) WithProfile(profile string) *ValidationOptions
     WithProfile sets the validation profile (e.g., "eu", "custom").
+
+func (o *ValidationOptions) WithProgress(progress types.ProgressFunc) *ValidationOptions
+    WithProgress sets a callback that receives progress events and returns the
+    options for chaining.
 
 func (o *ValidationOptions) WithRuleOverride(ruleCode string, enabled bool) *ValidationOptions
     WithRuleOverride enables or disables a specific validation rule and returns
@@ -648,6 +672,20 @@ type ValidationResult struct {
 	// Cache information
 	CacheHit bool   `json:"cacheHit,omitempty"`
 	FileHash string `json:"fileHash,omitempty"`
+
+	// Rules lists the XPath business rules that were configured for this validation.
+	Rules []RuleInfo `json:"-"`
+
+	// RuleChecksSkipped lists files whose XPath rule checks did not run because
+	// schema validation found errors (or the findings cap was reached) first.
+	RuleChecksSkipped []string `json:"ruleChecksSkipped,omitempty"`
+
+	// FailedFiles lists files of a dataset that could not be validated, as "file: error".
+	FailedFiles []string `json:"failedFiles,omitempty"`
+
+	// Truncated is set when the findings cap (MaxFindings) was reached, so
+	// validation stopped early and the results may be incomplete.
+	Truncated bool `json:"truncated,omitempty"`
 
 	// Has unexported fields.
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -8,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/theoremus-urban-solutions/netex-validator/types"
+	"github.com/theoremus-urban-solutions/netex-validator/logging"
 	"github.com/theoremus-urban-solutions/netex-validator/validator"
 )
 
@@ -38,7 +39,9 @@ var (
 	cacheMaxMemoryMB int
 	cacheTTLHours    int
 	// ruleSets is filled by extractRuleArgs before cobra parses the flags
-	ruleSets []validator.RuleSet
+	ruleSets   []validator.RuleSet
+	noColor    bool
+	noProgress bool
 )
 
 func main() {
@@ -63,6 +66,8 @@ Examples:
   netex-validator -i dataset.zip -c "MyCodespace" --rules rulesets/eu.json --rules ./local.json
   netex-validator -i data.xml -c "MyCodespace" --rules:eu=rulesets/eu.json --config custom-rules.yaml`,
 		RunE: validateCommand,
+		// Errors are printed by main, which stays quiet for errValidationFailed.
+		SilenceErrors: true,
 	}
 
 	// Add flags
@@ -75,6 +80,8 @@ Examples:
 	// Only registered for --help: extractRuleArgs consumes every --rules argument before cobra runs.
 	rootCmd.Flags().StringArray("rules", nil, "JSON rule file; repeat per file. Also --rules:<name>=<path> to set its namespace (required unless --skip-validators)")
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose output")
+	rootCmd.Flags().BoolVar(&noColor, "no-color", false, "Disable colors in the summary (also disabled when NO_COLOR is set or stderr is not a terminal)")
+	rootCmd.Flags().BoolVar(&noProgress, "no-progress", false, "Do not show a progress bar (it is only shown when stderr is a terminal)")
 	rootCmd.Flags().IntVar(&maxSchemaErrors, "max-schema-errors", 0, "Maximum schema errors to report (0 = use config default)")
 	rootCmd.Flags().StringVar(&configFile, "config", "", "Configuration file path")
 	rootCmd.Flags().BoolVar(&generateConfig, "generate-config", false, "Generate default configuration file")
@@ -146,9 +153,16 @@ Examples:
 	rootCmd.SetArgs(rest)
 
 	if err := rootCmd.Execute(); err != nil {
+		if !errors.Is(err, errValidationFailed) {
+			fmt.Fprintln(os.Stderr, "Error:", err)
+		}
 		os.Exit(1)
 	}
 }
+
+// errValidationFailed makes the CLI exit with status 1 without printing an error:
+// the summary already explains what was found.
+var errValidationFailed = errors.New("validation found errors")
 
 func validateCommand(cmd *cobra.Command, args []string) error {
 	// Flags were parsed fine: errors from here on (including "validation found
@@ -196,12 +210,18 @@ func validateCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	finishProgress := func() {}
+
 	// Create validation options
 	options := validator.DefaultValidationOptions().
 		WithCodespace(codespace).
 		WithSkipSchema(skipSchema).
 		WithVerbose(verbose).
 		WithConfigFile(configFile)
+	if !verbose {
+		// The summary reports the outcome; only show warnings and errors from the run itself
+		options = options.WithLogLevel(logging.LevelWarn)
+	}
 	options.SkipValidators = skipValidators
 	options.RuleSets = ruleSets
 	if profile != "" {
@@ -240,6 +260,20 @@ func validateCommand(cmd *cobra.Command, args []string) error {
 	}
 	options.OutputFormat = format
 
+	// Progress bar on the terminal; logs are written through it so they don't garble the line
+	if !noProgress && isTerminal(os.Stderr) {
+		bar := newProgressBar(os.Stderr, !noColor && useColor(os.Stderr))
+		defer bar.Finish()
+		options.Progress = bar.Handle
+		options.Logger = logging.NewLogger(logging.LoggerConfig{
+			Level:         options.LogLevel,
+			Format:        options.LogFormat,
+			Output:        bar,
+			IncludeSource: options.LogLevel == logging.LevelDebug,
+		})
+		finishProgress = bar.Finish
+	}
+
 	// Perform validation
 	var result *validator.ValidationResult
 	var err error
@@ -256,6 +290,9 @@ func validateCommand(cmd *cobra.Command, args []string) error {
 		}
 		result, err = validator.ValidateFile(inputFile, options)
 	}
+	// Remove the progress line before anything else is written, in particular
+	// the report, which goes to the same terminal when stdout is not redirected
+	finishProgress()
 
 	if err != nil {
 		return fmt.Errorf("validation failed: %w", err)
@@ -279,37 +316,17 @@ func validateCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	if verbose {
-		summary := result.Summary()
-		fmt.Fprintf(os.Stderr, "Validation completed: %d issues found (%d files processed)\n",
-			summary.TotalIssues, summary.FilesProcessed)
-
-		if len(summary.IssuesBySeverity) > 0 {
-			fmt.Fprintf(os.Stderr, "Issues by severity: ")
-			for severity, count := range summary.IssuesBySeverity {
-				fmt.Fprintf(os.Stderr, "%s:%d ", severityToString(severity), count)
-			}
-			fmt.Fprintf(os.Stderr, "\n")
-		}
-	}
-
 	// Output results
 	if err := outputResult(result, format); err != nil {
 		return fmt.Errorf("failed to output results: %w", err)
 	}
 
+	printSummary(os.Stderr, result, inputFile, !noColor && useColor(os.Stderr))
+
 	// Exit with error code if validation found errors
 	if !result.IsValid() {
-		if verbose {
-			fmt.Fprintf(os.Stderr, "Validation completed with errors\n")
-		}
-		return fmt.Errorf("validation found errors")
+		return errValidationFailed
 	}
-
-	if verbose {
-		fmt.Fprintf(os.Stderr, "Validation completed successfully\n")
-	}
-
 	return nil
 }
 
@@ -334,7 +351,7 @@ func outputResult(result *validator.ValidationResult, format string) error {
 	if outputFile != "" {
 		return os.WriteFile(outputFile, output, 0o600)
 	} else {
-		fmt.Print(string(output))
+		fmt.Println(string(output))
 		return nil
 	}
 }
@@ -378,19 +395,4 @@ output:
 
 	fmt.Printf("Generated default configuration file: %s\n", configPath)
 	return nil
-}
-
-func severityToString(severity types.Severity) string {
-	switch severity {
-	case types.INFO:
-		return "INFO"
-	case types.WARNING:
-		return "WARNING"
-	case types.ERROR:
-		return "ERROR"
-	case types.CRITICAL:
-		return "CRITICAL"
-	default:
-		return "UNKNOWN"
-	}
 }

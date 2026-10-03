@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/antchfx/xmlquery"
@@ -28,6 +29,7 @@ type EnhancedNetexValidatorsRunner struct {
 	reportEntryFactory interfaces.ValidationReportEntryFactory
 	maxFindings        int
 	concurrentFiles    int
+	progress           types.ProgressFunc
 }
 
 // EnhancedNetexValidatorsRunnerBuilder builds enhanced validator instances
@@ -40,6 +42,7 @@ type EnhancedNetexValidatorsRunnerBuilder struct {
 	reportEntryFactory interfaces.ValidationReportEntryFactory
 	maxFindings        int
 	concurrentFiles    int
+	progress           types.ProgressFunc
 }
 
 // NewEnhancedNetexValidatorsRunnerBuilder creates a new enhanced builder
@@ -103,6 +106,12 @@ func (b *EnhancedNetexValidatorsRunnerBuilder) WithConcurrentFiles(n int) *Enhan
 	return b
 }
 
+// WithProgress sets a callback that receives progress events
+func (b *EnhancedNetexValidatorsRunnerBuilder) WithProgress(progress types.ProgressFunc) *EnhancedNetexValidatorsRunnerBuilder {
+	b.progress = progress
+	return b
+}
+
 // Build creates the EnhancedNetexValidatorsRunner
 func (b *EnhancedNetexValidatorsRunnerBuilder) Build() (*EnhancedNetexValidatorsRunner, error) {
 	if b.reportEntryFactory == nil {
@@ -126,6 +135,7 @@ func (b *EnhancedNetexValidatorsRunnerBuilder) Build() (*EnhancedNetexValidators
 		reportEntryFactory: b.reportEntryFactory,
 		maxFindings:        b.maxFindings,
 		concurrentFiles:    b.concurrentFiles,
+		progress:           b.progress,
 	}, nil
 }
 
@@ -137,12 +147,20 @@ func (r *EnhancedNetexValidatorsRunner) ValidateFile(filePath, codespace string,
 	return r.validateSingleXMLFile(filePath, codespace, skipSchema, skipValidators)
 }
 
+// emit sends a progress event if a progress callback is set
+func (r *EnhancedNetexValidatorsRunner) emit(event types.ProgressEvent) {
+	if r.progress != nil {
+		r.progress(event)
+	}
+}
+
 // ValidateContent validates NetEX content directly
 func (r *EnhancedNetexValidatorsRunner) ValidateContent(fileName, codespace string, content []byte, skipSchema, skipValidators bool) (*types.ValidationReport, error) {
 	startTime := time.Now()
 	logger := logging.GetDefaultLogger().WithFile(fileName).WithValidation(generateReportID(fileName), codespace)
 
 	logger.ValidationStart(fileName, codespace)
+	defer r.emit(types.ProgressEvent{Stage: types.StageFileDone, File: fileName})
 	defer func() {
 		duration := time.Since(startTime)
 		if duration > 5*time.Second {
@@ -155,6 +173,7 @@ func (r *EnhancedNetexValidatorsRunner) ValidateContent(fileName, codespace stri
 
 	// Step 1: Schema validation (blocking)
 	if r.schemaValidator != nil && !skipSchema {
+		r.emit(types.ProgressEvent{Stage: types.StageSchema, File: fileName})
 		schemaStart := time.Now()
 		logger.SchemaValidationStart(fileName)
 
@@ -173,11 +192,15 @@ func (r *EnhancedNetexValidatorsRunner) ValidateContent(fileName, codespace stri
 		r.addEntriesWithCap(report, entries)
 
 		if len(schemaIssues) > 0 {
-			logger.Warn("Schema validation issues found", "count", len(schemaIssues))
+			logger.Info("Schema validation issues found", "count", len(schemaIssues))
 		}
 
 		if report.HasError() || r.reachedCap(report) {
 			logger.Info("Stopping validation due to schema errors")
+			// A cap stop is reported through report.Truncated instead
+			if report.HasError() && !skipValidators && len(r.xpathValidators) > 0 {
+				report.RuleChecksSkipped = append(report.RuleChecksSkipped, fileName)
+			}
 			return report, nil // Stop on schema errors
 		}
 	}
@@ -187,6 +210,7 @@ func (r *EnhancedNetexValidatorsRunner) ValidateContent(fileName, codespace stri
 	}
 
 	// Step 2: Prepare XPath validation context
+	r.emit(types.ProgressEvent{Stage: types.StageParsing, File: fileName})
 	xpathContext, err := r.prepareXPathValidationContext(reportID, codespace, fileName, content)
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare XPath context: %w", err)
@@ -280,91 +304,111 @@ func (r *EnhancedNetexValidatorsRunner) validateZipDataset(zipPath, codespace st
 		logger.Info("No XML files found in ZIP", "file", zipPath)
 		return report, nil
 	}
+	r.emit(types.ProgressEvent{Stage: types.StageDataset, File: zipPath, FilesTotal: expectedFiles})
 
-	// Prepare work list
+	// Every XML entry produces exactly one outcome, including entries that
+	// cannot be read and validations that panic, so the collector never waits
+	// for an outcome that will not come.
 	type job struct {
 		name    string
 		content []byte
+		err     error // set if the entry could not be read
+	}
+	type outcome struct {
+		report *types.ValidationReport
+		err    error
 	}
 
-	// Use buffered channels sized appropriately
-	jobs := make(chan job, expectedFiles)
-	results := make(chan []types.ValidationReportEntry, expectedFiles)
-	errs := make(chan error, expectedFiles)
+	jobs := make(chan job)
+	outcomes := make(chan outcome, expectedFiles) // never blocks workers
+	done := make(chan struct{})                   // closed when collection stops early
+
+	validate := func(j job) (o outcome) {
+		defer func() {
+			if rec := recover(); rec != nil {
+				o = outcome{err: fmt.Errorf("%s: panic during validation: %v", j.name, rec)}
+			}
+		}()
+		if j.err != nil {
+			r.emit(types.ProgressEvent{Stage: types.StageFileDone, File: j.name})
+			return outcome{err: fmt.Errorf("%s: %w", j.name, j.err)}
+		}
+		subReport, err := r.ValidateContent(j.name, codespace, j.content, skipSchema, skipValidators)
+		if err != nil {
+			return outcome{err: fmt.Errorf("%s: %w", j.name, err)}
+		}
+		return outcome{report: subReport}
+	}
 
 	workerCount := r.concurrentFiles
 	if workerCount <= 0 {
 		workerCount = 1
 	}
-
-	// Limit worker count to not exceed the number of files
 	if workerCount > expectedFiles {
 		workerCount = expectedFiles
 	}
 
-	// Workers
+	var workers sync.WaitGroup
 	for w := 0; w < workerCount; w++ {
+		workers.Add(1)
 		go func() {
-			defer func() {
-				// Recover from any panics in workers
-				if r := recover(); r != nil {
-					logger.Error("Worker panic", "error", r)
-					errs <- fmt.Errorf("worker panic: %v", r)
-					results <- nil
-				}
-			}()
-
+			defer workers.Done()
 			for j := range jobs {
-				subReport, err := r.ValidateContent(j.name, codespace, j.content, skipSchema, skipValidators)
-				if err != nil {
-					errs <- fmt.Errorf("%s: %w", j.name, err)
-					results <- nil
-					continue
-				}
-				entries := subReport.ValidationReportEntries
-				results <- entries
-				errs <- nil
+				outcomes <- validate(j)
 			}
 		}()
 	}
 
-	// Enqueue xml entries
+	// Enqueue xml entries, stopping early if collection stops
 	go func() {
 		defer close(jobs)
 		for _, f := range zr.File {
 			if strings.ToLower(filepath.Ext(f.Name)) != ".xml" {
 				continue
 			}
-			rc, err := f.Open()
-			if err != nil {
-				logger.ValidationError(f.Name, fmt.Errorf("failed to open zip entry: %w", err))
-				continue
+			j := job{name: f.Name}
+			if rc, err := f.Open(); err != nil {
+				j.err = fmt.Errorf("failed to open zip entry: %w", err)
+			} else {
+				j.content, err = io.ReadAll(rc)
+				_ = rc.Close()
+				if err != nil {
+					j.err = fmt.Errorf("failed to read zip entry: %w", err)
+				}
 			}
-			content, err := io.ReadAll(rc)
-			_ = rc.Close()
-			if err != nil {
-				logger.ValidationError(f.Name, fmt.Errorf("failed to read zip entry: %w", err))
-				continue
+			select {
+			case jobs <- j:
+			case <-done:
+				return
 			}
-			jobs <- job{name: f.Name, content: content}
 		}
 	}()
 
 	// Collect results
 	for i := 0; i < expectedFiles; i++ {
-		if e := <-errs; e != nil {
-			logger.ValidationError(zipPath, e)
+		o := <-outcomes
+		if o.err != nil {
+			logger.ValidationError(zipPath, o.err)
+			report.FailedFiles = append(report.FailedFiles, o.err.Error())
+			continue
 		}
-		entries := <-results
-		if len(entries) > 0 {
+		report.RuleChecksSkipped = append(report.RuleChecksSkipped, o.report.RuleChecksSkipped...)
+		report.Truncated = report.Truncated || o.report.Truncated
+		if entries := o.report.ValidationReportEntries; len(entries) > 0 {
 			r.addEntriesWithCap(report, entries)
-			if r.reachedCap(report) {
-				break
-			}
+		}
+		if r.reachedCap(report) {
+			report.Truncated = true
+			break
 		}
 	}
+	// Stop handing out files and let the validations in progress finish, so
+	// nothing runs concurrently with the cross-file checks below
+	close(done)
+	workers.Wait()
 
 	// Cross-file ID validation at the end
+	r.emit(types.ProgressEvent{Stage: types.StageReferences, File: zipPath})
 	if idIssues, err := r.FinalizeIdValidation(); err == nil && len(idIssues) > 0 {
 		r.addEntriesWithCap(report, r.convertIssuesToEntries(idIssues))
 	} else if err != nil {
@@ -610,6 +654,8 @@ func (r *EnhancedNetexValidatorsRunner) addEntriesWithCap(report *types.Validati
 		report.AddAllValidationReportEntries(entries)
 		return
 	}
+	// Once the cap is reached, validation stops early, so later findings are lost
+	defer func() { report.Truncated = report.Truncated || r.reachedCap(report) }()
 	remaining := r.maxFindings - len(report.ValidationReportEntries)
 	if remaining <= 0 {
 		return

@@ -139,9 +139,11 @@ func (l *Logger) XPathValidationStart(filename string, ruleCount int)
 type LoggerConfig struct {
 	// Level sets the minimum log level.
 	Level LogLevel
-	// Format specifies the output format ("json" or "text").
+	// Format specifies the output format: "plain" (message only, the default),
+	// "text" (key=value) or "json".
 	Format string
-	// Output specifies the output destination.
+	// Output specifies the output destination (default: stderr, so logs do not
+	// mix with reports written to stdout).
 	Output io.Writer
 	// IncludeSource adds source code information to log entries.
 	IncludeSource bool

@@ -132,6 +132,9 @@ func (b *EnhancedNetexValidatorsRunnerBuilder) WithJAXBValidators(validators []i
 func (b *EnhancedNetexValidatorsRunnerBuilder) WithMaxFindings(limit int) *EnhancedNetexValidatorsRunnerBuilder
     WithMaxFindings sets a cap on total findings to collect
 
+func (b *EnhancedNetexValidatorsRunnerBuilder) WithProgress(progress types.ProgressFunc) *EnhancedNetexValidatorsRunnerBuilder
+    WithProgress sets a callback that receives progress events
+
 func (b *EnhancedNetexValidatorsRunnerBuilder) WithSchemaValidator(validator interfaces.SchemaValidator) *EnhancedNetexValidatorsRunnerBuilder
     WithSchemaValidator sets the schema validator
 

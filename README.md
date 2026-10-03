@@ -85,6 +85,12 @@ Download the latest release from the [GitHub Releases page](https://github.com/t
 Business rules are not built into the binary: they are read from the JSON rule files passed
 with `--rules` (see [Rule Sets](#-rule-sets)). `--rules` is required unless `--skip-validators` is given.
 
+The report goes to stdout (or `-o`). On stderr, the CLI shows a progress bar while running and a
+colored summary at the end: each rule that found issues with its level and count, totals per
+severity and how many rules found no issues. Use `--no-progress` / `--no-color` (or `NO_COLOR`) to
+turn them off; both are automatically off when stderr is not a terminal. `--verbose` also shows
+the log messages of the run. The exit code is 1 when the data is invalid.
+
 #### Advanced Options
 ```bash
 # Run the EU rules plus extra rule files

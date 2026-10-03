@@ -40,8 +40,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `AllowSchemaNetwork`). Downloaded schemas were not used (XSD validation is not implemented),
   and unreachable schema hosts could block validation for minutes.
 
+### Added (CLI)
+- A colored summary on stderr after each run: findings per rule with level and count, totals per
+  severity, how many rules found no issues, files whose rule checks were skipped or that could not
+  be validated. Colors are disabled with `--no-color`, `NO_COLOR` or when stderr is not a terminal.
+- A progress bar on stderr while validating (only on a terminal; `--no-progress` disables it).
+  Library users can receive the same events with `ValidationOptions.Progress` / `WithProgress`.
+- `ValidationResult.Rules`, `RuleChecksSkipped`, `FailedFiles` and `Truncated` (set when
+  `--max-findings` stopped validation early). The JSON reports include `failedFiles`,
+  `ruleChecksSkipped`, `truncated` and `error` when set.
+- Without `--verbose`, the CLI only logs warnings and errors.
+- **Behaviour change:** `ValidationResult.IsValid()` now returns false when files of a ZIP dataset
+  could not be validated (`FailedFiles`); before, such files were silently ignored.
+
 ### Fixed
 - `--skip-validators` was ignored by the CLI.
+- ZIP validation could hang forever when an entry could not be read or a validation panicked,
+  and kept validating files after `--max-findings` was reached.
+- ZIP datasets ignored `--skip-schema` / `--skip-validators`, reported 1 processed file, and
+  silently dropped files that failed to parse (they are now listed in `FailedFiles` and make the
+  result invalid).
+- Warnings and errors in the plain log format now include their context (file, error).
 - The CLI no longer prints the usage text after a validation run that found errors.
 
 ## [1.0.2] - 2025-09-01

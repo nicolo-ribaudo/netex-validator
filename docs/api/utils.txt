@@ -104,6 +104,10 @@ type ValidationCache interface {
     ValidationCache provides caching of validation results by file hash
 
 type XPathRuleValidator struct {
+
+	// OnRuleDone, if set, is called after each rule with the file name and the
+	// number of rules done so far. It may be called concurrently for different files.
+	OnRuleDone func(fileName string, done, total int)
 	// Has unexported fields.
 }
     XPathRuleValidator implements XPath-based validation

@@ -35,6 +35,12 @@ type OptimizedGroupedResult struct {
 	CacheHit       bool          `json:"cacheHit,omitempty"`
 	FileHash       string        `json:"fileHash,omitempty"`
 
+	// Incomplete validation
+	FailedFiles       []string `json:"failedFiles,omitempty"`
+	RuleChecksSkipped []string `json:"ruleChecksSkipped,omitempty"`
+	Truncated         bool     `json:"truncated,omitempty"`
+	Error             string   `json:"error,omitempty"`
+
 	// NetEX element statistics
 	Statistics NetEXStatistics `json:"statistics,omitempty"`
 }
@@ -170,11 +176,15 @@ func (r *ValidationResult) createOptimizedGrouping() *OptimizedGroupedResult {
 			Warnings: warnings,
 			Info:     info,
 		},
-		FilesProcessed: r.FilesProcessed,
-		ProcessingTime: r.ProcessingTime,
-		CacheHit:       r.CacheHit,
-		FileHash:       r.FileHash,
-		Statistics:     statistics,
+		FilesProcessed:    r.FilesProcessed,
+		ProcessingTime:    r.ProcessingTime,
+		CacheHit:          r.CacheHit,
+		FileHash:          r.FileHash,
+		FailedFiles:       r.FailedFiles,
+		RuleChecksSkipped: r.RuleChecksSkipped,
+		Truncated:         r.Truncated,
+		Error:             r.Error,
+		Statistics:        statistics,
 	}
 }
 

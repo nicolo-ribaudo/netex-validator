@@ -136,6 +136,7 @@ type NetexValidator struct {
 	codespace       string
 	validationCache utils.ValidationCache
 	options         *ValidationOptions
+	rules           []RuleInfo // XPath rules configured in initializeRunner
 }
 
 // New creates a new NetexValidator instance with default configuration.
@@ -417,7 +418,7 @@ func (v *NetexValidator) ValidateZip(zipPath string) (*ValidationResult, error) 
 	}
 
 	// Use the validator's built-in ZIP support
-	report, err := v.runner.ValidateFile(zipPath, v.codespace, false, false)
+	report, err := v.runner.ValidateFile(zipPath, v.codespace, v.options.SkipSchema, v.options.SkipValidators)
 	if err != nil {
 		return &ValidationResult{
 			Error:        fmt.Sprintf("ZIP validation failed: %v", err),
@@ -427,6 +428,7 @@ func (v *NetexValidator) ValidateZip(zipPath string) (*ValidationResult, error) 
 
 	// Convert to result format
 	result := v.createValidationResultFromReport(report, filepath.Base(zipPath), startTime)
+	result.FilesProcessed = len(rawContents)
 
 	// Store raw content for statistics extraction
 	for fileName, content := range rawContents {
@@ -604,10 +606,16 @@ func (v *NetexValidator) initializeRunner(opts *ValidationOptions) error {
 		// Wrap rules as XPathValidationRule implementations
 		xrules := make([]utils.XPathValidationRule, 0, len(enabled))
 		for _, r := range enabled {
+			v.rules = append(v.rules, RuleInfo{ID: r.Code, Name: r.Name, Severity: r.Severity})
 			xrules = append(xrules, NewSimpleXPathRule(r))
 		}
 		if len(xrules) > 0 {
 			xpathValidator := utils.NewXPathRuleValidator(xrules)
+			if progress := opts.Progress; progress != nil {
+				xpathValidator.OnRuleDone = func(fileName string, done, total int) {
+					progress(types.ProgressEvent{Stage: types.StageRules, File: fileName, RulesDone: done, RulesTotal: total})
+				}
+			}
 			builder = builder.WithXPathValidators([]interfaces.XPathValidator{xpathValidator})
 		}
 	}
@@ -634,6 +642,7 @@ func (v *NetexValidator) initializeRunner(opts *ValidationOptions) error {
 
 	// Set validation report entry factory
 	builder = builder.WithValidationReportEntryFactory(engine.NewDefaultValidationReportEntryFactory())
+	builder = builder.WithProgress(opts.Progress)
 
 	// Build runner
 	runner, err := builder.Build()
@@ -678,6 +687,10 @@ func (v *NetexValidator) createValidationResultFromReport(report *types.Validati
 		ValidationReportEntries:          resultEntries,
 		NumberOfValidationEntriesPerRule: entriesPerRule,
 		ProcessingTime:                   time.Since(startTime),
+		Rules:                            v.rules,
+		RuleChecksSkipped:                report.RuleChecksSkipped,
+		FailedFiles:                      report.FailedFiles,
+		Truncated:                        report.Truncated,
 	}
 }
 

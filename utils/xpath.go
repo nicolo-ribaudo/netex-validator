@@ -15,6 +15,10 @@ type XPathValidationRule interface {
 // XPathRuleValidator implements XPath-based validation
 type XPathRuleValidator struct {
 	rules []XPathValidationRule
+
+	// OnRuleDone, if set, is called after each rule with the file name and the
+	// number of rules done so far. It may be called concurrently for different files.
+	OnRuleDone func(fileName string, done, total int)
 }
 
 // NewXPathRuleValidator creates a new XPath rule validator
@@ -38,12 +42,15 @@ func (v *XPathRuleValidator) Validate(ctx context.XPathValidationContext) ([]typ
 	var issues []types.ValidationIssue
 
 	// Execute all XPath rules
-	for _, rule := range v.rules {
+	for i, rule := range v.rules {
 		ruleIssues, err := rule.Validate(ctx)
 		if err != nil {
 			return nil, err
 		}
 		issues = append(issues, ruleIssues...)
+		if v.OnRuleDone != nil {
+			v.OnRuleDone(ctx.GetFileName(), i+1, len(v.rules))
+		}
 	}
 
 	return issues, nil
